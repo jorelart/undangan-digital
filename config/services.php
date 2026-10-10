@@ -8,24 +8,24 @@ return [
     |--------------------------------------------------------------------------
     |
     | This file is for storing the credentials for third party services such
-    | as Resend, Postmark, AWS, and more. This file provides the de facto
+    | as Mailgun, Postmark, AWS and more. This file provides the de facto
     | location for this type of information, allowing packages to have
     | a conventional file to locate the various service credentials.
     |
     */
 
     'postmark' => [
-        'key' => env('POSTMARK_API_KEY'),
-    ],
-
-    'resend' => [
-        'key' => env('RESEND_API_KEY'),
+        'token' => env('POSTMARK_TOKEN'),
     ],
 
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    ],
+
+    'resend' => [
+        'key' => env('RESEND_KEY'),
     ],
 
     'slack' => [
@@ -36,12 +36,7 @@ return [
     ],
 
     'whatsapp' => [
-        'api_version' => env('WHATSAPP_API_VERSION', 'v23.0'),
-        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
-        'token' => env('WHATSAPP_TOKEN'),
-        'owner_phone' => env('WHATSAPP_OWNER_PHONE'),
-        'template_name' => env('WHATSAPP_TEMPLATE_NAME', 'rsvp_notification'),
-        'template_language' => env('WHATSAPP_TEMPLATE_LANGUAGE', 'id'),
+        'webhook_token' => env('WHATSAPP_WEBHOOK_TOKEN'),
     ],
 
 ];

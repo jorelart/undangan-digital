@@ -1,0 +1,42 @@
+#elementor-popup-modal-21841,
+.elementor-location-popup[data-elementor-id="21841"] {
+	display: none !important;
+}
+
+.slideAwal .elementor-element-272ef931,
+.slideAwal .elementor-element-411ca819,
+.slideAwal .elementor-element-7c4abfdc,
+.slideAwal .elementor-element-2f567259 {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	transition: opacity 600ms ease !important;
+}
+
+body.invitation-content-ready .slideAwal .elementor-element-272ef931,
+body.invitation-content-ready .slideAwal .elementor-element-411ca819,
+body.invitation-content-ready .slideAwal .elementor-element-7c4abfdc,
+body.invitation-content-ready .slideAwal .elementor-element-2f567259 {
+	opacity: 1 !important;
+	visibility: visible !important;
+}
+
+.elementor-element-89b880a .elementor-gallery__container {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.elementor-element-89b880a .e-gallery-item {
+	min-width: 0;
+}
+
+.elementor-element-89b880a .e-gallery-image {
+	width: 100%;
+	aspect-ratio: 2 / 3;
+	background-position: center;
+	background-size: cover;
+}
+
+.rsvp-stats {
+	display: none !important;
+}

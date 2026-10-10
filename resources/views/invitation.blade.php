@@ -1,491 +1,2243 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#273b34">
-    <meta name="description" content="Undangan pernikahan {{ $invitation['couple'] }}. Merupakan kebahagiaan bagi kami jika Anda berkenan hadir.">
-    <title>The Wedding of {{ $invitation['couple'] }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --forest: #273b34;
-            --forest-deep: #1d2e28;
-            --sage: #a6b29c;
-            --cream: #f7f3e9;
-            --paper: #fffdf7;
-            --gold: #c9a86d;
-            --ink: #27332d;
-            --muted: #73786f;
-            --serif: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
-            --script: "Great Vibes", "Brush Script MT", cursive;
-            --sans: "DM Sans", "Avenir Next", "Segoe UI", sans-serif;
-        }
-        * { box-sizing: border-box; }
-        html { scroll-behavior: smooth; scroll-padding-top: 28px; }
-        body { margin: 0; color: var(--ink); background: var(--cream); font-family: var(--sans); }
-        a { color: inherit; }
-        button, input, textarea { font: inherit; }
-        .opening {
-            position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px;
-            color: var(--cream); text-align: center; background:
-                linear-gradient(180deg, #1527204d, #172d27c9),
-                radial-gradient(ellipse at 18% 15%, #758c7078 0, transparent 38%),
-                radial-gradient(ellipse at 84% 82%, #c6a76a5c 0, transparent 36%),
-                linear-gradient(145deg, #47614c, var(--forest-deep));
-            transition: opacity 1s ease, visibility 1s ease;
-            isolation: isolate;
-        }
-        .opening::before, .opening::after {
-            position: absolute; content: ""; width: min(70vw, 440px); aspect-ratio: 1; border: 1px solid #d8c9a36b; border-radius: 50%;
-        }
-        .opening::before { animation: wreath-turn 48s linear infinite; }
-        .opening::after { width: min(58vw, 360px); border-style: dashed; animation: wreath-turn 72s linear infinite reverse; }
-        .opening-frame { position: absolute; inset: 15px; z-index: -1; border: 1px solid #e4d5ad59; pointer-events: none; }
-        .opening-frame::before, .opening-frame::after { position: absolute; left: 50%; width: 1px; height: 55px; content: ""; background: linear-gradient(transparent, var(--gold)); }
-        .opening-frame::before { top: 0; }
-        .opening-frame::after { bottom: 0; transform: rotate(180deg); }
-        .opening-sprig { position: absolute; z-index: 1; left: 50%; width: 158px; color: #d5bc83; transform: translateX(-50%); }
-        .opening-sprig.opening-sprig { top: 26px; }
-        .opening-footer-sprig { position: absolute; bottom: 18px; left: 50%; width: 112px; height: 32px; color: #d5bc83; transform: translateX(-50%); }
-        .opening.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-        .opening-card { position: relative; z-index: 1; max-width: 560px; padding: 32px; animation: card-arrive 1.2s cubic-bezier(.2,.8,.2,1) both; }
-        .eyebrow { margin: 0 0 14px; color: var(--gold); font-size: .68rem; letter-spacing: .28em; text-transform: uppercase; }
-        .opening h1 { margin: 0; color: #e4cf99; font: 400 clamp(4.1rem, 12vw, 7.7rem)/1.05 var(--script); text-shadow: 0 5px 28px #17251f50; }
-        .opening-date { margin: 12px 0 5px; font-family: var(--serif); font-size: 1.35rem; letter-spacing: .24em; }
-        .small-label { color: #e4dfd1; font-size: .78rem; letter-spacing: .11em; }
-        .guest-label { margin-top: 36px; color: #ded9cd; font-size: .83rem; }
-        .guest-name { margin: 7px 0 24px; font: 1.5rem var(--serif); }
-        .button {
-            display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 10px;
-            border: 1px solid var(--gold); border-radius: 2px; padding: 0 24px; color: var(--cream);
-            background: transparent; text-decoration: none; letter-spacing: .08em; cursor: pointer; transition: color .3s ease, background .3s ease, transform .3s ease;
-        }
-        .button:hover { color: var(--forest); background: var(--gold); transform: translateY(-2px); }
-        .button-solid { color: var(--paper); background: var(--forest); }
-        .button-solid:hover { color: var(--forest); background: var(--gold); }
-        .main { width: min(100% - 36px, 1120px); margin: 0 auto; }
-        .hero {
-            min-height: 720px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 36px; padding: 76px 0;
-        }
-        .hero-copy { padding: 32px 0; }
-        .hero h2 { max-width: 600px; margin: 0; font: 500 clamp(3.5rem, 7vw, 6.2rem)/.82 var(--serif); letter-spacing: -.045em; }
-        .hero h2 span { display: block; margin: .09em 0 0 .04em; color: #71816f; font: 400 clamp(4.1rem, 8vw, 7.2rem)/1.05 var(--script); letter-spacing: 0; white-space: nowrap; }
-        .hero-quote { max-width: 460px; margin: 26px 0 32px; color: var(--muted); line-height: 1.8; }
-        .hero-art {
-            position: relative; min-height: 550px; display: grid; place-items: center; overflow: hidden;
-            border-radius: 230px 230px 4px 4px; color: var(--cream);
-            background: radial-gradient(ellipse at 50% 37%, #98a17c 0, transparent 25%),
-                radial-gradient(ellipse at 52% 85%, #b99b6c 0, transparent 28%),
-                linear-gradient(180deg, #aebca4 0%, #697d65 42%, #293f34 100%);
-            box-shadow: 0 30px 70px #28372b20;
-        }
-        .hero-art::before { position: absolute; inset: 20px; z-index: 1; content: ""; border: 1px solid #ded1aa80; border-radius: 220px 220px 2px 2px; pointer-events: none; }
-        .hero-art::after { position: absolute; inset: 17% 18%; content: ""; border: 1px solid #d8c9a34a; border-radius: 50%; transform: rotate(35deg); animation: wreath-breathe 7s ease-in-out infinite; }
-        .hero-botanical { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .72; }
-        .art-caption { position: relative; z-index: 2; margin-top: 165px; text-align: center; text-shadow: 0 3px 22px #192b23a6; }
-        .art-caption small { display: block; margin-bottom: 2px; color: #e4d5ad; font-size: .63rem; letter-spacing: .3em; text-transform: uppercase; }
-        .art-caption strong { display: block; color: #fff9eb; font: 400 clamp(3.2rem, 6vw, 5.3rem)/1.14 var(--script); }
-        .section { position: relative; padding: 100px 0; text-align: center; }
-        .section-dark { padding-right: 18px; padding-left: 18px; color: var(--cream); background: var(--forest); }
-        .section h2 { margin: 0 0 14px; font: 400 clamp(2.8rem, 5vw, 4.8rem)/.95 var(--serif); }
-        .section-intro { max-width: 610px; margin: 0 auto 42px; color: var(--muted); line-height: 1.8; }
-        .section-dark .section-intro { color: #d3d5cb; }
-        .ornament { display: flex; width: 128px; align-items: center; gap: 11px; margin: 23px auto; color: var(--gold); }
-        .ornament::before, .ornament::after { height: 1px; flex: 1; content: ""; background: currentColor; }
-        .ornament svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.2; }
-        .floral-divider { display: block; width: 130px; height: 40px; margin: 22px auto 27px; overflow: visible; color: var(--gold); }
-        .section-dark .floral-divider { color: #dfc891; }
-        .couple-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 35px; max-width: 850px; margin: 0 auto; }
-        .person { padding: 22px; }
-        .person-monogram { position: relative; width: 162px; height: 204px; display: grid; place-items: center; margin: 0 auto 26px; border: 1px solid #c9a86d80; border-radius: 100px 100px 3px 3px; color: var(--forest); background: radial-gradient(ellipse at 48% 35%, #edf0df 0, #d7ddcc 35%, #aab79f 100%); font: 4.6rem var(--script); box-shadow: 0 15px 38px #28372b16; }
-        .person-monogram::after { position: absolute; inset: 9px; content: ""; border: 1px solid #c9a86d72; border-radius: 100px 100px 0 0; }
-        .person h3 { margin: 0; color: var(--forest); font: 400 2.8rem var(--script); }
-        .person p { margin: 10px 0 0; color: var(--muted); line-height: 1.7; }
-        .ampersand { color: var(--gold); font: 400 4rem var(--script); }
-        .countdown { display: flex; justify-content: center; gap: clamp(14px, 5vw, 58px); margin: 42px 0 10px; }
-        .countdown div { min-width: 70px; }
-        .countdown strong { display: block; font: 400 clamp(2rem, 5vw, 3.8rem) var(--serif); }
-        .countdown span { color: #d1d4ca; font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; }
-        .event-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; max-width: 820px; margin: 0 auto; text-align: left; }
-        .event-card { position: relative; padding: 38px 30px 30px; border: 1px solid #d6d0c1; background: var(--paper); transition: transform .45s ease, box-shadow .45s ease; }
-        .event-card::before { position: absolute; inset: 8px; content: ""; border: 1px solid #d6d0c180; pointer-events: none; }
-        .event-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px #273b341a; }
-        .event-card h3 { margin: 0 0 18px; color: var(--forest); font: 400 2.5rem var(--serif); }
-        .event-card p { margin: 8px 0; color: var(--muted); line-height: 1.6; }
-        .event-card .event-date { color: var(--ink); font-weight: 600; }
-        .map-link { display: inline-block; margin-top: 16px; color: #657660; font-size: .85rem; text-underline-offset: 4px; }
-        .story-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 960px; margin: 44px auto 0; text-align: left; }
-        .story-item { position: relative; padding: 25px 22px; border-top: 1px solid var(--gold); }
-        .story-item::before { position: absolute; top: -4px; left: 22px; width: 7px; height: 7px; content: ""; border: 1px solid var(--gold); border-radius: 50%; background: var(--cream); }
-        .story-item small { color: var(--gold); letter-spacing: .14em; }
-        .story-item h3 { margin: 10px 0; font: 400 1.7rem var(--serif); }
-        .story-item p { margin: 0; color: var(--muted); line-height: 1.75; }
-        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 840px; margin: 34px auto 0; }
-        .gallery-tile { position: relative; min-height: 200px; display: grid; place-items: center; overflow: hidden; border: 1px solid #d1c7ae; color: #fff9eb; font: 400 2rem var(--script); text-shadow: 0 2px 12px #273b34b3; background: linear-gradient(140deg, #738675, #c6b798); transition: transform .6s ease, box-shadow .6s ease; }
-        .gallery-tile::before, .gallery-tile::after { position: absolute; content: ""; pointer-events: none; }
-        .gallery-tile::before { inset: 9px; border: 1px solid #fff9eb80; }
-        .gallery-tile::after { inset: 22% 28%; border: 1px solid #fff9eb4f; border-radius: 50%; transform: rotate(-30deg); }
-        .gallery-tile:hover { z-index: 1; transform: scale(1.035); box-shadow: 0 15px 36px #273b3433; }
-        .gallery-tile:nth-child(2), .gallery-tile:nth-child(5) { background: linear-gradient(155deg, #b2bda8, #e2d6bf); }
-        .rsvp-layout { display: grid; grid-template-columns: .8fr 1.2fr; gap: 54px; align-items: start; max-width: 900px; margin: 0 auto; text-align: left; }
-        .rsvp-note { padding: 30px; color: var(--cream); background: var(--forest); }
-        .rsvp-note h3 { margin: 0 0 18px; font: 400 2rem var(--serif); }
-        .rsvp-note p { color: #d7d9d0; line-height: 1.8; }
-        .stat-row { display: flex; gap: 24px; margin-top: 25px; }
-        .stat-row strong { display: block; color: #e0c58f; font: 400 1.8rem var(--serif); }
-        .stat-row span { color: #d7d9d0; font-size: .8rem; }
-        .form-field { margin-bottom: 18px; }
-        .form-field label, .form-label { display: block; margin-bottom: 8px; font-size: .88rem; font-weight: 600; }
-        .form-field input, .form-field textarea {
-            width: 100%; border: 1px solid #d3ccbd; border-radius: 2px; padding: 13px 14px; color: var(--ink); background: var(--paper);
-        }
-        .form-field textarea { min-height: 115px; resize: vertical; }
-        .form-field input:focus, .form-field textarea:focus { outline: 2px solid #a6b29c; outline-offset: 1px; }
-        .attendance-options { display: flex; gap: 10px; }
-        .attendance-option { position: relative; flex: 1; }
-        .attendance-option input { position: absolute; width: 1px; height: 1px; margin: 0; border: 0; padding: 0; opacity: 0; }
-        .attendance-option span { display: block; border: 1px solid #d3ccbd; padding: 12px; text-align: center; cursor: pointer; }
-        .attendance-option input:checked + span { border-color: var(--forest); color: var(--paper); background: var(--forest); }
-        .attendance-option input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
-        .status-message { margin: 0 auto 25px; padding: 14px 18px; max-width: 900px; color: #1f573f; background: #e4efe5; }
-        .error-list { margin: 0 auto 25px; padding: 14px 32px; max-width: 900px; color: #873e31; background: #f7e7e2; text-align: left; }
-        .wishes { max-width: 760px; margin: 52px auto 0; text-align: left; }
-        .wishes h3 { text-align: center; font: 400 2rem var(--serif); }
-        .wish { padding: 18px 0; border-bottom: 1px solid #dcd5c7; }
-        .wish strong { font: 400 1.25rem var(--serif); }
-        .wish p { margin: 7px 0 0; color: var(--muted); line-height: 1.65; }
-        .footer { position: relative; margin-top: 0; overflow: hidden; padding: 65px 20px; color: var(--cream); background: radial-gradient(ellipse at 50% 130%, #52654e, transparent 60%), var(--forest-deep); text-align: center; }
-        .footer p { color: #d1d4ca; }
-        .footer strong { display: block; color: #e4cf99; font: 400 4.4rem var(--script); }
-        .js-enabled .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1); }
-        .js-enabled .reveal.is-visible { opacity: 1; transform: translateY(0); }
-        .js-enabled .reveal-delay-1 { transition-delay: .12s; }
-        .js-enabled .reveal-delay-2 { transition-delay: .24s; }
-        .js-enabled .reveal-delay-3 { transition-delay: .36s; }
-        .js-enabled .opening.is-hidden ~ main .hero-copy,
-        .js-enabled .opening.is-hidden ~ main .hero-art { transition-duration: 1.1s; }
-        @keyframes wreath-turn { to { transform: rotate(360deg); } }
-        @keyframes wreath-breathe { 0%, 100% { transform: rotate(35deg) scale(.94); opacity: .55; } 50% { transform: rotate(35deg) scale(1.04); opacity: 1; } }
-        @keyframes card-arrive { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        @media (max-width: 720px) {
-            .hero { min-height: auto; grid-template-columns: 1fr; gap: 12px; padding: 50px 0 70px; }
-            .hero-copy { padding: 15px 0; }
-            .hero-art { min-height: 390px; grid-row: 1; }
-            .hero h2 { font-size: clamp(3.1rem, 14vw, 5.4rem); }
-            .hero h2 span { font-size: clamp(3.8rem, 15vw, 5.8rem); }
-            .hero-quote { max-width: 100%; }
-            .section { padding: 68px 0; }
-            .couple-grid { grid-template-columns: 1fr; gap: 6px; }
-            .person { padding: 10px; }
-            .person-monogram { width: 132px; height: 166px; }
-            .ampersand { line-height: 1; }
-            .event-grid, .rsvp-layout { grid-template-columns: 1fr; gap: 18px; }
-            .story-list { grid-template-columns: 1fr; gap: 5px; }
-            .gallery-grid { grid-template-columns: 1fr 1fr; }
-            .gallery-tile { min-height: 145px; }
-            .opening-frame { inset: 9px; }
-            .opening h1 { font-size: clamp(3.8rem, 17vw, 5.3rem); }
-            .section { padding: 76px 0; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-            .js-enabled .reveal { opacity: 1; transform: none; }
-        }
-    </style>
+	<meta charset="UTF-8">
+		<meta name='robots' content='noindex, nofollow' />
+
+	<!-- This site is optimized with the Yoast SEO plugin v28.3 - https://yoast.com/product/yoast-seo-wordpress/ -->
+	<title>Undangan Website Premium 06</title>
+	<meta name="description" content="Buat undangan website untuk pernikahanmu secara mudah, murah dan cepat. Jadikan acara kamu jadi lebih berkesan !" />
+	<meta property="og:locale" content="id_ID" />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="Undangan Website Premium 06" />
+	<meta property="og:description" content="Buat undangan website untuk pernikahanmu secara mudah, murah dan cepat. Jadikan acara kamu jadi lebih berkesan !" />
+	<meta property="og:url" content="./" />
+	<meta property="og:site_name" content="Undangan Digital" />
+	<meta property="article:modified_time" content="2026-09-14T01:26:05+00:00" />
+	<meta property="og:image" content="assets/vendor/site/wp-content/uploads/2025/11/PREMIUM-VINTAGE-06-2.webp" />
+	<meta property="og:image:width" content="1076" />
+	<meta property="og:image:height" content="1080" />
+	<meta property="og:image:type" content="image/webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:label1" content="Estimasi waktu membaca" />
+	<meta name="twitter:data1" content="1 menit" />
+	<!-- / Yoast SEO plugin. -->
+
+
+<style>
+      .niku-multiline { white-space: normal; }
+      .niku-multiline br,
+      .niku-multiline br.niku-lb {
+        display: block;
+        margin: 0;
+        line-height: 1.5;
+        content: '';
+      }
+      .deskripsi-ls-marker {
+        display: block;
+        font-size: 0.875rem;
+        line-height: 1.65;
+        font-weight: 400;
+        text-align: center;
+      }
+      .deskripsi-ls-marker .niku-multiline,
+      .deskripsi-ls-marker strong,
+      .deskripsi-ls-marker em {
+        font-size: inherit;
+        line-height: inherit;
+      }
+      .deskripsi-ls-marker strong { font-weight: 600; }
+      .deskripsi-ls-marker em { font-style: italic; }
+    </style><style id="wp-img-auto-sizes-contain-inline-css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-emoji-styles-inline-css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}.wp-block-button{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;--wp--preset--dimension--75: 75%;--wp--preset--dimension--100: 100%;}:root { --wp--style--global--content-size: 800px;--wp--style--global--wide-size: 1200px; }:where(body) { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.wp-site-blocks) > * { margin-block-start: 24px; margin-block-end: 0; }:where(.wp-site-blocks) > :first-child { margin-block-start: 0; }:where(.wp-site-blocks) > :last-child { margin-block-end: 0; }:root { --wp--style--block-gap: 24px; }:root :where(.is-layout-flow) > :first-child{margin-block-start: 0;}:root :where(.is-layout-flow) > :last-child{margin-block-end: 0;}:root :where(.is-layout-flow) > *{margin-block-start: 24px;margin-block-end: 0;}:root :where(.is-layout-constrained) > :first-child{margin-block-start: 0;}:root :where(.is-layout-constrained) > :last-child{margin-block-end: 0;}:root :where(.is-layout-constrained) > *{margin-block-start: 24px;margin-block-end: 0;}:root :where(.is-layout-flex){gap: 24px;}:root :where(.is-layout-grid){gap: 24px;}.is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+:root :where(.wp-block-icon svg){width: 24px;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+<link rel='stylesheet' id='hello-elementor-css' href='assets/vendor/site/wp-content/themes/hello-elementor/assets/css/reset.css' media='all' />
+<link rel='stylesheet' id='hello-elementor-theme-style-css' href='assets/vendor/site/wp-content/themes/hello-elementor/assets/css/theme.css' media='all' />
+<link rel='stylesheet' id='hello-elementor-header-footer-css' href='assets/vendor/site/wp-content/themes/hello-elementor/assets/css/header-footer.css' media='all' />
+<link rel='stylesheet' id='elementor-frontend-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/css/frontend.min.css' media='all' />
+<link rel='stylesheet' id='elementor-post-4-css' href='assets/vendor/site/wp-content/uploads/elementor/css/post-4.css' media='all' />
+<link rel='stylesheet' id='idb-photo-gallery-widgets-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/gallery.775628f9.css' media='all' />
+<link rel='stylesheet' id='bisdev-use-any-font-legacy-css' href='assets/vendor/site/wp-content/uploads/useanyfont/uaf.css' media='all' />
+<style id="bisdev-font-faces-selective-inline-css">
+@font-face {
+  font-family: 'Alcantera Serif';
+  src: url('assets/vendor/site/wp-content/uploads/bisdev-fonts/alcantera-serif-QRGqIY.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Alcantera Serif Qrgq Iy';
+  src: url('assets/vendor/site/wp-content/uploads/bisdev-fonts/alcantera-serif-QRGqIY.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aston Script';
+  src: url('assets/vendor/site/wp-content/uploads/bisdev-fonts/aston-script-8iMO8G.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aston Script 8I Mo8G';
+  src: url('assets/vendor/site/wp-content/uploads/bisdev-fonts/aston-script-8iMO8G.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Tempting';
+  src: url('assets/vendor/site/wp-content/uploads/bisdev-fonts/tempting-ZSFLAR.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Tempting Zsflar';
+  src: url('assets/vendor/site/wp-content/uploads/bisdev-fonts/tempting-ZSFLAR.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Trajan';
+  src: url('assets/vendor/site/wp-content/uploads/bisdev-fonts/trajan-IHn5hH.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Trajan Ihn5H H';
+  src: url('assets/vendor/site/wp-content/uploads/bisdev-fonts/trajan-IHn5hH.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*# sourceURL=bisdev-font-faces-selective-inline-css */
+</style>
+<link rel='stylesheet' id='elementor-icons-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css' media='all' />
+<link rel='stylesheet' id='widget-heading-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/css/widget-heading.min.css' media='all' />
+<link rel='stylesheet' id='widget-spacer-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/css/widget-spacer.min.css' media='all' />
+<link rel='stylesheet' id='e-animation-fadeInUp-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInUp.min.css' media='all' />
+<link rel='stylesheet' id='widget-image-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/css/widget-image.min.css' media='all' />
+<link rel='stylesheet' id='bisdev-social-icons-widget-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/social-icons.d016fd0b.css' media='all' />
+<link rel='stylesheet' id='elementor-icons-shared-0-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.min.css' media='all' />
+<link rel='stylesheet' id='elementor-icons-fa-solid-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/font-awesome/css/solid.min.css' media='all' />
+<link rel='stylesheet' id='elementor-icons-fa-brands-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/font-awesome/css/brands.min.css' media='all' />
+<link rel='stylesheet' id='widget-lottie-css' href='assets/vendor/site/wp-content/plugins/elementor-pro/assets/css/widget-lottie.min.css' media='all' />
+<link rel='stylesheet' id='bisdev-countdown-widget-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/countdown.d88ec802.css' media='all' />
+<link rel='stylesheet' id='widget-divider-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/css/widget-divider.min.css' media='all' />
+<link rel='stylesheet' id='idb-reveal-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/reveal.15681c8f.css' media='all' />
+<link rel='stylesheet' id='bisdev-timeline-widget-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/timeline.b7b7b82b.css' media='all' />
+<link rel='stylesheet' id='bisdev-invite-video-widget-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/invite-video.c31f4224.css' media='all' />
+<link rel='stylesheet' id='swiper-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css' media='all' />
+<link rel='stylesheet' id='e-swiper-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/css/conditionals/e-swiper.min.css' media='all' />
+<link rel='stylesheet' id='widget-gallery-css' href='assets/vendor/site/wp-content/plugins/elementor-pro/assets/css/widget-gallery.min.css' media='all' />
+<link rel='stylesheet' id='elementor-gallery-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/e-gallery/css/e-gallery.min.css' media='all' />
+<link rel='stylesheet' id='e-transitions-css' href='assets/vendor/site/wp-content/plugins/elementor-pro/assets/css/conditionals/transitions.min.css' media='all' />
+<link rel='stylesheet' id='bisdev-copy-rekening-widget-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/copy-rekening.565fcadf.css' media='all' />
+<link rel='stylesheet' id='bisdev-kirim-hadiah-widget-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/kirim-hadiah.a1a6ce9a.css' media='all' />
+<link rel='stylesheet' id='e-animation-zoomIn-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/animations/styles/zoomIn.min.css' media='all' />
+<link rel='stylesheet' id='bisdev-konfirmasi-transfer-widget-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/konfirmasi-transfer.0a1407f6.css' media='all' />
+<link rel='stylesheet' id='niku-rsvp-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/rsvp.14496a03.css' media='all' />
+<link rel='stylesheet' id='e-sticky-css' href='assets/vendor/site/wp-content/plugins/elementor-pro/assets/css/modules/sticky.min.css' media='all' />
+<link rel='stylesheet' id='bisdev-musik-widget-style-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/musik.3623714a.css' media='all' />
+<link rel='stylesheet' id='elementor-post-32120-css' href='assets/vendor/site/wp-content/uploads/elementor/css/post-32120.css' media='all' />
+<link rel='stylesheet' id='bisdev-watermark-branding-css' href='assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/css/watermark.c03279ad.css' media='all' />
+<style id="idb-hide-section-toggle-fallback-inline-css">
+body.idb-hide-love-story .ls-section{display:none!important}body.idb-hide-wedding-gift .gift-con,body.idb-hide-wedding-gift .idb-copy-rek{display:none!important}body.idb-hide-kirim-hadiah .kh-con,body.idb-hide-kirim-hadiah .idb-kirim-hadiah{display:none!important}body.idb-hide-live-streaming .stream-con{display:none!important}body.idb-hide-wedding-gift.idb-hide-kirim-hadiah .amplop-section{display:none!important}
+/*# sourceURL=idb-hide-section-toggle-fallback-inline-css */
+</style>
+<style id="idb-ios-input-zoom-fix-inline-css">
+@media screen and (max-width:768px){input[type="text"],input[type="email"],input[type="tel"],input[type="number"],input[type="search"],input[type="url"],input[type="password"],input:not([type]),textarea,select{font-size:16px!important;}}
+/*# sourceURL=idb-ios-input-zoom-fix-inline-css */
+</style>
+<link rel='stylesheet' id='elementor-gf-roboto-css' href='assets/vendor/fonts/google-css/family-roboto-100-100italic-200-200italic-300-300italic-400-400i-85c5c2b0.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-robotoslab-css' href='assets/vendor/fonts/google-css/family-roboto-slab-100-100italic-200-200italic-300-300italic-400-ec7864c0.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-abhayalibre-css' href='assets/vendor/fonts/google-css/family-abhaya-libre-100-100italic-200-200italic-300-300italic-40-9ce58f32.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-questrial-css' href='assets/vendor/fonts/google-css/family-questrial-100-100italic-200-200italic-300-300italic-400-4-edc7b6c9.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-cormorantgaramond-css' href='assets/vendor/fonts/google-css/family-cormorant-garamond-100-100italic-200-200italic-300-300ita-4e2e618e.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-librecaslontext-css' href='assets/vendor/fonts/google-css/family-libre-caslon-text-100-100italic-200-200italic-300-300ital-b9edc991.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-ballet-css' href='assets/vendor/fonts/google-css/family-ballet-100-100italic-200-200italic-300-300italic-400-400i-faec3f4d.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-cormorantupright-css' href='assets/vendor/fonts/google-css/family-cormorant-upright-100-100italic-200-200italic-300-300ital-75fbdfe5.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-jura-css' href='assets/vendor/fonts/google-css/family-jura-100-100italic-200-200italic-300-300italic-400-400ita-5f3d7145.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-quicksand-css' href='assets/vendor/fonts/google-css/family-quicksand-100-100italic-200-200italic-300-300italic-400-4-b52e0b6e.css' media='all' />
+<link rel='stylesheet' id='elementor-gf-montserrat-css' href='assets/vendor/fonts/google-css/family-montserrat-100-100italic-200-200italic-300-300italic-400--40d2b044.css' media='all' />
+<link rel='stylesheet' id='elementor-icons-fa-regular-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/font-awesome/css/regular.min.css' media='all' />
+<script id="jquery-core-js" src="assets/vendor/site/wp-includes/js/jquery/jquery.min.js"></script>
+<script id="jquery-migrate-js" src="assets/vendor/site/wp-includes/js/jquery/jquery-migrate.min.js"></script>
+<script id="bisdev-browser-protection-js-extra">
+var bisdevBrowserProtection = {"mode":"off","redirectUrl":"https://punakawandigital.id/"};
+//# sourceURL=bisdev-browser-protection-js-extra
+</script>
+<script id="bisdev-browser-protection-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/browser-protection.c86bd548.js"></script>
+<meta name="generator" content="WordPress 7.1.3" />
+<meta name="generator" content="Elementor 4.2.3; features: additional_custom_breakpoints; settings: css_print_method-external, google_font-enabled, font_display-swap">
+			<style>
+				.e-con.e-parent:nth-of-type(n+4):not(.e-lazyloaded):not(.e-no-lazyload),
+				.e-con.e-parent:nth-of-type(n+4):not(.e-lazyloaded):not(.e-no-lazyload) * {
+					background-image: none !important;
+				}
+				@media screen and (max-height: 1024px) {
+					.e-con.e-parent:nth-of-type(n+3):not(.e-lazyloaded):not(.e-no-lazyload),
+					.e-con.e-parent:nth-of-type(n+3):not(.e-lazyloaded):not(.e-no-lazyload) * {
+						background-image: none !important;
+					}
+				}
+				@media screen and (max-height: 640px) {
+					.e-con.e-parent:nth-of-type(n+2):not(.e-lazyloaded):not(.e-no-lazyload),
+					.e-con.e-parent:nth-of-type(n+2):not(.e-lazyloaded):not(.e-no-lazyload) * {
+						background-image: none !important;
+					}
+				}
+			</style>
+			<link rel="icon" href="assets/vendor/site/wp-content/uploads/2025/03/cropped-PUNAKAWAN-32x32.png" sizes="32x32" />
+<link rel="icon" href="assets/vendor/site/wp-content/uploads/2025/03/cropped-PUNAKAWAN-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="assets/vendor/site/wp-content/uploads/2025/03/cropped-PUNAKAWAN-180x180.png" />
+<meta name="msapplication-TileImage" content="assets/vendor/site/wp-content/uploads/2025/03/cropped-PUNAKAWAN-270x270.png" />
+<style id="idb-gift-confirm-off">.elementor-widget-bisdev_konfirmasi_transfer,.elementor-element[data-widget_type="bisdev_konfirmasi_transfer.default"],.idb-konfirmasi-transfer{display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important;visibility:hidden!important}</style><script id="idb-gift-confirm-off-js">document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll(".elementor-widget-bisdev_konfirmasi_transfer,.elementor-element[data-widget_type=\"bisdev_konfirmasi_transfer.default\"],.idb-konfirmasi-transfer").forEach(function(el){try{el.remove();}catch(e){el.style.display="none";}});});</script><style id="wp-custom-css">
+.elementor-button-wrapper {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+	<link rel="stylesheet" href="assets/css/local-overrides.css">
 </head>
-<body>
-    <div class="opening" id="opening">
-        <div class="opening-frame" aria-hidden="true"></div>
-        <svg class="floral-divider opening-sprig" viewBox="0 0 180 48" aria-hidden="true">
-            <path d="M90 43V17M90 28c-10-1-18-7-21-16 11 1 19 7 21 16Zm0 5c10-1 18-7 21-16-11 1-19 7-21 16ZM90 23c-8-7-8-15 0-21 8 6 8 14 0 21Zm-9 19H41m98 0H99M51 42c7-8 13-8 19 0-6 8-12 8-19 0Zm78 0c-7-8-13-8-19 0 6 8 12 8 19 0Z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <div class="opening-card">
-            <p class="eyebrow">The Wedding of</p>
-            <h1>{{ $invitation['couple'] }}</h1>
-            <p class="opening-date">{{ \Illuminate\Support\Carbon::parse($invitation['date'])->format('d . m . Y') }}</p>
-            <p class="small-label">Dengan penuh rasa syukur, kami mengundang Anda</p>
-            <p class="guest-label">Kepada Yth.</p>
-            <p class="guest-name">{{ $guestName }}</p>
-            <button class="button" id="openInvitation" type="button">Buka Undangan <span aria-hidden="true">↓</span></button>
+<body class="wp-singular page-template-default page page-id-32120 wp-custom-logo wp-embed-responsive wp-theme-hello-elementor hello-elementor-default elementor-default elementor-template-canvas elementor-kit-4 elementor-page elementor-page-32120 idb-slot-empty-cover idb-slot-empty-opening idb-slot-empty-closing idb-slot-empty-mempelai1 idb-slot-empty-mempelai2">
+	<link rel="stylesheet" href="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/css/anti-cubit.css">
+<link rel="stylesheet" href="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/css/foto.css">
+<link rel="stylesheet" href="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/css/reveal-masuk-dulu.css">
+<link rel="stylesheet" href="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/css/jarak-button-teks.css">
+<link rel="stylesheet" href="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/css/res-desktop.css">
+<link rel="stylesheet" href="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/reveal/reveal.css">
+<script defer src="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/reveal/reveal.js"></script>
+<script defer src="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/js/reveal-masuk-dulu.js"></script>
+<script defer src="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/js/vh.js"></script>
+<script defer src="assets/vendor/cdn/gh/Bisdev-gift/elementor-script@main/js/vid.js"></script>
+
+		<div data-elementor-type="wp-page" data-elementor-id="32120" class="elementor elementor-32120" data-elementor-post-type="page">
+				<div class="elementor-element elementor-element-17e831a8 e-con-full e-flex e-con e-parent" data-id="17e831a8" data-element_type="container" data-e-type="container" id="sec">
+		<div class="elementor-element elementor-element-565c4d14 e-con-full e-flex e-con e-child" data-id="565c4d14" data-element_type="container" data-e-type="container" id="kolom" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-296ddb88 elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="200" style="transition-duration: 2000ms; transition-delay: 200ms;" data-id="296ddb88" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">The Wedding of</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-7dd51fc5 elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="400" style="transition-duration: 2000ms; transition-delay: 400ms;" data-id="7dd51fc5" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Habib &amp; Adiba</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-5e7c0b60 elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="600" style="transition-duration: 2000ms; transition-delay: 600ms;" data-id="5e7c0b60" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Kepada Bapak/Ibu/Saudara/i</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-65c18954 elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="800" style="transition-duration: 2000ms; transition-delay: 800ms;" data-id="65c18954" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default" id="invitation-guest-name">{{ $guestName }}</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-5da2861e elementor-align-center elementor-widget elementor-widget-button" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="1000" style="transition-duration: 2000ms; transition-delay: 1000ms;" data-id="5da2861e" data-element_type="widget" data-e-type="widget" id="open" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-size-sm" role="button">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Buka Undangan</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				<div class="elementor-element elementor-element-6fafbbeb elementor-widget elementor-widget-spacer" data-id="6fafbbeb" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-258985b9 e-con-full e-flex e-con e-parent" data-id="258985b9" data-element_type="container" data-e-type="container">
+		<div class="elementor-element elementor-element-7f82a71c e-con-full elementor-hidden-tablet elementor-hidden-mobile e-flex e-con e-child" data-id="7f82a71c" data-element_type="container" data-e-type="container" id="desk_cov" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="idb-reveal idb-ef zoom-top-right elementor-element elementor-element-79c8681b elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="200" style="transition-duration: 2000ms; transition-delay: 200ms;" data-id="79c8681b" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<p class="elementor-heading-title elementor-size-default">The Wedding of</p>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-top-right elementor-element elementor-element-c1befc elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="400" style="transition-duration: 2000ms; transition-delay: 400ms;" data-id="c1befc" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<p class="elementor-heading-title elementor-size-default">Habib &amp; Adiba</p>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-top-right elementor-element elementor-element-28a54d85 elementor-widget elementor-widget-text-editor" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="600" style="transition-duration: 2000ms; transition-delay: 600ms;" data-id="28a54d85" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									&#8220;Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.&#8221;<br><br>(Qs. Ar-Rum : 21)								</div>
+				</div>
+				<div class="elementor-element elementor-element-5520dc4f elementor-widget elementor-widget-spacer" data-id="5520dc4f" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-6626d23e e-con-full e-flex e-con e-child" data-id="6626d23e" data-element_type="container" data-e-type="container">
+		<div class="elementor-element elementor-element-a9a6af0 e-con-full slideAwal e-flex e-con e-child" data-id="a9a6af0" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;video&quot;,&quot;background_video_link&quot;:&quot;assets\/vendor\/site\/wp-content\/uploads\/2026\/06\/VINTAGE-06-BARU.mp4&quot;,&quot;background_video_start&quot;:0.1,&quot;background_play_once&quot;:&quot;yes&quot;,&quot;background_play_on_mobile&quot;:&quot;yes&quot;}">
+		<div class="elementor-background-video-container">
+							<video class="elementor-background-video-hosted" role="presentation" autoplay muted playsinline></video>
+					</div><div class="idb-reveal idb-ef zoom-out elementor-element elementor-element-4dc6b06f e-con-full e-flex e-con e-child" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="11000" style="transition-duration: 2000ms; transition-delay: 11000ms;" data-id="4dc6b06f" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-272ef931 elementor-widget elementor-widget-heading" data-id="272ef931" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">The Wedding of</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-411ca819 elementor-widget elementor-widget-text-editor" data-id="411ca819" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Habib <br>&amp; Adiba								</div>
+				</div>
+				<div class="elementor-element elementor-element-7c4abfdc animated-slow elementor-invisible elementor-widget elementor-widget-heading" data-id="7c4abfdc" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_animation&quot;:&quot;fadeInUp&quot;,&quot;_animation_delay&quot;:3000}" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">28. 12. 2026</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-2f567259 elementor-align-center elementor-widget elementor-widget-button" data-id="2f567259" data-element_type="widget" data-e-type="widget" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-button-link elementor-size-xs" href="#date">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Save The Date</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+				<div class="elementor-element elementor-element-26bc33dc elementor-widget elementor-widget-spacer" data-id="26bc33dc" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-6df8a987 e-con-full e-flex e-con e-child" data-id="6df8a987" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="elementor-element elementor-element-5b573fd elementor-widget elementor-widget-spacer" data-id="5b573fd" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-15668f06 ayat elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="15668f06" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" decoding="async" width="875" height="1130" src="assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903.jpg" class="attachment-full size-full wp-image-34076" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903.jpg 875w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903-232x300.jpg 232w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903-793x1024.jpg 793w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903-768x992.jpg 768w" sizes="(max-width: 875px) 100vw, 875px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-1a9746e7 elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="1a9746e7" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<span class="elementor-heading-title elementor-size-default">"Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir."<br><br>(Qs. Ar-Rum : 21)</span>				</div>
+				</div>
+				<div class="elementor-element elementor-element-15d8a400 elementor-widget elementor-widget-spacer" data-id="15d8a400" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef slide-right elementor-element elementor-element-225af7e2 elementor-absolute fla1 e-transform elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="225af7e2" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_rotateZ_effect&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:13,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_tablet&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_mobile&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img decoding="async" width="810" height="1149" src="assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII.webp" class="attachment-full size-full wp-image-34077" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII.webp 810w, assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII-211x300.webp 211w, assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII-722x1024.webp 722w, assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII-768x1089.webp 768w" sizes="(max-width: 810px) 100vw, 810px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef slide-left elementor-element elementor-element-3a78c700 elementor-absolute fla1 e-transform e-transform elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="3a78c700" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_rotateZ_effect&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:-10,&quot;sizes&quot;:[]},&quot;_transform_flipX_effect&quot;:&quot;transform&quot;,&quot;_transform_rotateZ_effect_tablet&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_mobile&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img decoding="async" width="810" height="1149" src="assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII.webp" class="attachment-full size-full wp-image-34077" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII.webp 810w, assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII-211x300.webp 211w, assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII-722x1024.webp 722w, assets/vendor/site/wp-content/uploads/2026/06/MERAHTREE-GREEN-PII-768x1089.webp 768w" sizes="(max-width: 810px) 100vw, 810px" />															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-39c426bb e-con-full e-flex e-con e-child" data-id="39c426bb" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-3a8fb7c1 elementor-widget elementor-widget-spacer" data-id="3a8fb7c1" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-5fb39bf5 elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="5fb39bf5" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Bride Groom</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-83bd9ad elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="83bd9ad" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i serta kerabat sekalian untuk menghadiri acara pernikahan kami.</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5fcb3524 elementor-widget elementor-widget-spacer" data-id="5fcb3524" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+		<div class="elementor-element elementor-element-70b6e0c e-con-full e-flex e-con e-child" data-id="70b6e0c" data-element_type="container" data-e-type="container">
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-227ec4ee fra elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="227ec4ee" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img decoding="async" width="1024" height="1535" src="assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL_.jpg" class="attachment-full size-full wp-image-34079" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL_.jpg 1024w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL_-200x300.jpg 200w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL_-683x1024.jpg 683w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL_-768x1151.jpg 768w" sizes="(max-width: 1024px) 100vw, 1024px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-13a3d576 elementor-widget__width-inherit elementor-absolute fla1 elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="13a3d576" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-663c5241 elementor-widget__width-inherit elementor-absolute fla1 e-transform elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="663c5241" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-4857e28d elementor-widget__width-inherit elementor-absolute pluse e-transform elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="4857e28d" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="213" height="150" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A42-GREEN-PII.png" class="attachment-full size-full wp-image-34083" alt="" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-f44b0a7 elementor-widget__width-inherit elementor-absolute pluse elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="f44b0a7" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="213" height="150" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A42-GREEN-PII.png" class="attachment-full size-full wp-image-34083" alt="" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-9626993 elementor-widget__width-inherit elementor-absolute flb1 e-transform elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="9626993" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_rotateZ_effect&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:36,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_tablet&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_mobile&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-3bf6cf4e elementor-widget__width-inherit elementor-absolute flb1 e-transform e-transform elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="3bf6cf4e" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;,&quot;_transform_rotateZ_effect&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:-36,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_tablet&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_mobile&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-58f11c26 elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="58f11c26" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Habib</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-287cdc72 elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="287cdc72" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Habib Yulianto</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-4367c3ba elementor-widget__width-inherit elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="4367c3ba" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Putra Kedua dari <span class="ayah-marker" data-idb-mempelai-side="pria">Bapak M. Dawam</span><br>
+<span class="ibu-marker" data-idb-mempelai-side="pria">(Almh) Ibu Dewi Sudarwati</span>								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-2f1ead90 elementor-widget elementor-widget-bisdev_social_icons" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="2f1ead90" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_social_icons.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-social-icons is-auto-columns  is-shape-circle" style="">
+                                            <a
+                    class="idb-social-icons__item elementor-animation-grow"
+                    href="https://www.instagram.com/"
+                    aria-label="Instagram"
+                    title="Instagram"
+                    style=""
+                                        target="_blank"                    rel="nofollow noopener noreferrer"                >
+                    <i class="fab fa-instagram" aria-hidden="true"></i>                                    </a>
+                    </div>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-41b9eb51 ef zoom-in elementor-widget elementor-widget-heading" data-id="41b9eb51" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">dan</h2>				</div>
+				</div>
+		<div class="elementor-element elementor-element-36d0c352 e-con-full e-flex e-con e-child" data-id="36d0c352" data-element_type="container" data-e-type="container">
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-424f619 fra elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="424f619" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1024" height="1535" src="assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL.jpg" class="attachment-full size-full wp-image-34086" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL.jpg 1024w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL-200x300.jpg 200w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL-683x1024.jpg 683w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_PROFIL-768x1151.jpg 768w" sizes="(max-width: 1024px) 100vw, 1024px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-2084917e elementor-widget__width-inherit elementor-absolute fla1 elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="2084917e" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-445798d1 elementor-widget__width-inherit elementor-absolute fla1 e-transform elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="445798d1" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-6e6d1368 elementor-widget__width-inherit elementor-absolute pluse e-transform elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="6e6d1368" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="213" height="150" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A42-GREEN-PII.png" class="attachment-full size-full wp-image-34083" alt="" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-1a952243 elementor-widget__width-inherit elementor-absolute pluse elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="1a952243" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="213" height="150" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A42-GREEN-PII.png" class="attachment-full size-full wp-image-34083" alt="" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-75ca08e4 elementor-widget__width-inherit elementor-absolute flb1 e-transform elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="75ca08e4" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_rotateZ_effect&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:36,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_tablet&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_mobile&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-in elementor-element elementor-element-69b89a91 elementor-widget__width-inherit elementor-absolute flb1 e-transform e-transform elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="500" style="transition-duration: 2000ms; transition-delay: 500ms;" data-id="69b89a91" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;,&quot;_transform_rotateZ_effect&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:-36,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_tablet&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_rotateZ_effect_mobile&quot;:{&quot;unit&quot;:&quot;deg&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-16953ca4 elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="16953ca4" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Adiba</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-5ebf07c8 elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="5ebf07c8" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Adiba Putri Syakila</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-691ed6c9 elementor-widget__width-inherit elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="691ed6c9" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Putri Pertama dari <span class="ayah-marker" data-idb-mempelai-side="wanita">Bapak Anas Rifai</span><br>
+<span class="ibu-marker" data-idb-mempelai-side="wanita">Ibu Kholifah</span>								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-4683e469 elementor-widget elementor-widget-bisdev_social_icons" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="4683e469" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_social_icons.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-social-icons is-auto-columns  is-shape-circle" style="">
+                                            <a
+                    class="idb-social-icons__item elementor-animation-grow"
+                    href="https://www.instagram.com/"
+                    aria-label="Instagram"
+                    title="Instagram"
+                    style=""
+                                        target="_blank"                    rel="nofollow noopener noreferrer"                >
+                    <i class="fab fa-instagram" aria-hidden="true"></i>                                    </a>
+                    </div>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-59c477c6 elementor-widget elementor-widget-spacer" data-id="59c477c6" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-1307dee9 elementor-widget elementor-widget-spacer" data-id="1307dee9" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-120093cb elementor-absolute elementor-widget__width-initial elementor-widget-mobile__width-initial elementor-align-center elementor-widget elementor-widget-lottie" data-id="120093cb" data-element_type="widget" data-e-type="widget" data-settings="{&quot;source_json&quot;:{&quot;url&quot;:&quot;assets\/vendor\/site\/wp-content\/uploads\/2026\/06\/bird-hitam-4-2.json&quot;,&quot;id&quot;:34088,&quot;size&quot;:&quot;&quot;},&quot;loop&quot;:&quot;yes&quot;,&quot;_position&quot;:&quot;absolute&quot;,&quot;source&quot;:&quot;media_file&quot;,&quot;caption_source&quot;:&quot;none&quot;,&quot;link_to&quot;:&quot;none&quot;,&quot;trigger&quot;:&quot;arriving_to_viewport&quot;,&quot;viewport&quot;:{&quot;unit&quot;:&quot;%&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:{&quot;start&quot;:0,&quot;end&quot;:100}},&quot;play_speed&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:1,&quot;sizes&quot;:[]},&quot;start_point&quot;:{&quot;unit&quot;:&quot;%&quot;,&quot;size&quot;:0,&quot;sizes&quot;:[]},&quot;end_point&quot;:{&quot;unit&quot;:&quot;%&quot;,&quot;size&quot;:100,&quot;sizes&quot;:[]},&quot;renderer&quot;:&quot;svg&quot;}" data-widget_type="lottie.default">
+				<div class="elementor-widget-container">
+					<div class="e-lottie__container"><div class="e-lottie__animation"></div></div>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5f60892b elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-id="5f60892b" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1837" height="134" src="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png" class="attachment-full size-full wp-image-34089" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png 1837w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-300x22.png 300w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1024x75.png 1024w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-768x56.png 768w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1536x112.png 1536w" sizes="(max-width: 1837px) 100vw, 1837px" />															</div>
+				</div>
+				<div class="elementor-element elementor-element-53e0296b elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-id="53e0296b" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1837" height="134" src="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png" class="attachment-full size-full wp-image-34089" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png 1837w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-300x22.png 300w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1024x75.png 1024w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-768x56.png 768w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1536x112.png 1536w" sizes="(max-width: 1837px) 100vw, 1837px" />															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-73ea38e e-con-full e-flex e-con e-child" data-id="73ea38e" data-element_type="container" data-e-type="container" id="date" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="elementor-element elementor-element-5d0d6a74 elementor-widget elementor-widget-spacer" data-id="5d0d6a74" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-5265eefe elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="5265eefe" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Save The Date</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-36249857 elementor-widget__width-inherit elementor-widget elementor-widget-bisdev_countdown" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="36249857" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_countdown.default">
+				<div class="elementor-widget-container">
+					<div class="idb-countdown" data-target="1798426800000" data-target-iso="2026-12-28T03:00:00+00:00" data-show-days="1" data-show-hours="1" data-show-minutes="1" data-show-seconds="1" data-label-days="Hari" data-label-hours="Jam" data-label-minutes="Menit" data-label-seconds="Detik">  <div class="idb-countdown__row"><div class="idb-countdown__item" data-part="days">  <div class="idb-countdown__num" data-role="num">0</div>  <div class="idb-countdown__label" data-role="label">Hari</div></div><div class="idb-countdown__item" data-part="hours">  <div class="idb-countdown__num" data-role="num">0</div>  <div class="idb-countdown__label" data-role="label">Jam</div></div><div class="idb-countdown__item" data-part="minutes">  <div class="idb-countdown__num" data-role="num">0</div>  <div class="idb-countdown__label" data-role="label">Menit</div></div><div class="idb-countdown__item" data-part="seconds">  <div class="idb-countdown__num" data-role="num">0</div>  <div class="idb-countdown__label" data-role="label">Detik</div></div>  </div></div>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-350ccbbb elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="350ccbbb" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Dan kami bersyukur, dipertemukan Allah di waktu terbaik, Kini kami menanti hari istimewa kami.								</div>
+				</div>
+				<div class="elementor-element elementor-element-26838608 elementor-widget elementor-widget-spacer" data-id="26838608" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-48a936da elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-id="48a936da" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1837" height="134" src="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png" class="attachment-full size-full wp-image-34089" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png 1837w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-300x22.png 300w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1024x75.png 1024w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-768x56.png 768w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1536x112.png 1536w" sizes="(max-width: 1837px) 100vw, 1837px" />															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-5c8b117e e-con-full acara-con e-flex e-con e-child" data-id="5c8b117e" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="elementor-element elementor-element-31e0aba9 elementor-widget elementor-widget-spacer" data-id="31e0aba9" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+		<div class="elementor-element elementor-element-efdb95 e-con-full e-flex e-con e-child" data-id="efdb95" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-1f575cbc elementor-widget elementor-widget-spacer" data-id="1f575cbc" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-6719c297 elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="6719c297" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default"><span class="nama-acara-marker" data-event-index="0">Akad Nikah</span></h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-147145fc elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="147145fc" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Senin, 28 Desember 2026								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-61102bcf elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="61102bcf" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Pukul : 08.00 WIB								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-7b84c106 elementor-widget-divider--view-line_icon elementor-view-default elementor-widget-divider--element-align-center elementor-widget elementor-widget-divider" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="7b84c106" data-element_type="widget" data-e-type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+							<div class="elementor-icon elementor-divider__element">
+					<i aria-hidden="true" class="fas fa-map-marker-alt"></i></div>
+						</span>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-436ad99c elementor-widget elementor-widget-text-editor" data-id="436ad99c" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Tempat : <span class="niku-multiline"><strong>KEDIAMAN MEMPELAI WANITA</strong><br class="niku-lb">Ds Pagu, Wates, Kediri, <br class="niku-lb">Jawa Timur</span>								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-5dbccb03 elementor-widget elementor-widget-bisdev_social_icons" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="5dbccb03" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_social_icons.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-social-icons is-auto-columns is-location-buttons is-shape-circle" style="--idb-loc-btn-text:#FFFFFF;">
+                                            <a
+                    class="idb-social-icons__item elementor-animation-grow"
+                    href="https://maps.app.goo.gl/GgLwpE6Qq8GZYBJh9"
+                    aria-label="Akad Nikah"
+                    title="Akad Nikah"
+                    style=""
+                    data-idb-maps-link="1"                    target="_blank"                    rel="nofollow noopener noreferrer"                >
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>                                                                    <span class="idb-social-icons__text">Lihat Lokasi</span>
+                                    </a>
+                    </div>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-3b9555b9 elementor-widget elementor-widget-spacer" data-id="3b9555b9" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-59dd6882 elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-id="59dd6882" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1080" height="250" src="assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII.webp" class="attachment-full size-full wp-image-34094" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII.webp 1080w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-300x69.webp 300w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-1024x237.webp 1024w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-768x178.webp 768w" sizes="(max-width: 1080px) 100vw, 1080px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-left elementor-element elementor-element-68bb9987 elementor-absolute fla1 elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="68bb9987" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-right elementor-element elementor-element-2359ea58 elementor-absolute fla1 e-transform elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="2359ea58" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-out elementor-element elementor-element-6ca56ffe elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="6ca56ffe" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1080" height="463" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII.webp" class="attachment-full size-full wp-image-34096" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII.webp 1080w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-300x129.webp 300w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-1024x439.webp 1024w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-768x329.webp 768w" sizes="(max-width: 1080px) 100vw, 1080px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-left elementor-element elementor-element-4409feef elementor-absolute flb1 elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="4409feef" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-right elementor-element elementor-element-710b0c28 elementor-absolute flb1 e-transform elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="710b0c28" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-67952455 e-con-full acara-con e-flex e-con e-child" data-id="67952455" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="elementor-element elementor-element-653de833 elementor-widget elementor-widget-spacer" data-id="653de833" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+		<div class="elementor-element elementor-element-38637978 e-con-full e-flex e-con e-child" data-id="38637978" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-74e7328c elementor-widget elementor-widget-spacer" data-id="74e7328c" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-2bc6348e elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="2bc6348e" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default"><span class="nama-acara-marker" data-event-index="1">Resepsi</span></h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-577ad1ab elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="577ad1ab" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Senin, 28 Desember 2026								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-33b95f24 elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="33b95f24" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Pukul : 10.00 WIB &#8211; Selesai								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-61daa429 elementor-widget-divider--view-line_icon elementor-view-default elementor-widget-divider--element-align-center elementor-widget elementor-widget-divider" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="61daa429" data-element_type="widget" data-e-type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+							<div class="elementor-icon elementor-divider__element">
+					<i aria-hidden="true" class="fas fa-map-marker-alt"></i></div>
+						</span>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-649c29e2 elementor-widget elementor-widget-text-editor" data-id="649c29e2" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Tempat : <span class="niku-multiline"><strong>KEDIAMAN MEMPELAI WANITA<br class="niku-lb"></strong>Ds Pagu, Wates, Kediri, <br class="niku-lb">Jawa Timur</span>								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-6a0a05e3 elementor-widget elementor-widget-bisdev_social_icons" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="6a0a05e3" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_social_icons.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-social-icons is-auto-columns is-location-buttons is-shape-circle" style="--idb-loc-btn-text:#FFFFFF;">
+                                            <a
+                    class="idb-social-icons__item elementor-animation-grow"
+                    href="https://www.google.com/maps"
+                    aria-label="Resepsi"
+                    title="Resepsi"
+                    style=""
+                    data-idb-maps-link="1"                    target="_blank"                    rel="nofollow noopener noreferrer"                >
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>                                                                    <span class="idb-social-icons__text">Lihat Lokasi</span>
+                                    </a>
+                    </div>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-19db68d6 elementor-widget elementor-widget-spacer" data-id="19db68d6" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-4d223f9a elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-id="4d223f9a" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1080" height="250" src="assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII.webp" class="attachment-full size-full wp-image-34094" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII.webp 1080w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-300x69.webp 300w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-1024x237.webp 1024w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-768x178.webp 768w" sizes="(max-width: 1080px) 100vw, 1080px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-left elementor-element elementor-element-46933dba elementor-absolute fla1 elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="46933dba" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-right elementor-element elementor-element-7bc8720d elementor-absolute fla1 e-transform elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="7bc8720d" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-out elementor-element elementor-element-16d19a15 elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="16d19a15" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1080" height="463" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII.webp" class="attachment-full size-full wp-image-34096" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII.webp 1080w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-300x129.webp 300w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-1024x439.webp 1024w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-768x329.webp 768w" sizes="(max-width: 1080px) 100vw, 1080px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-left elementor-element elementor-element-14467dd elementor-absolute flb1 elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="14467dd" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-right elementor-element elementor-element-137ff158 elementor-absolute flb1 e-transform elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="137ff158" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-684292c2 e-con-full acara-con e-flex e-con e-child" data-id="684292c2" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="elementor-element elementor-element-695636c7 elementor-widget elementor-widget-spacer" data-id="695636c7" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+		<div class="elementor-element elementor-element-43a7aed8 e-con-full e-flex e-con e-child" data-id="43a7aed8" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-22496be0 elementor-widget elementor-widget-spacer" data-id="22496be0" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-2ab0a1a7 elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="2ab0a1a7" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default"><span class="nama-acara-marker" data-event-index="2"></span></h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-6e0aee90 elementor-widget-divider--view-line_icon elementor-view-default elementor-widget-divider--element-align-center elementor-widget elementor-widget-divider" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="6e0aee90" data-element_type="widget" data-e-type="widget" data-widget_type="divider.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-divider">
+			<span class="elementor-divider-separator">
+							<div class="elementor-icon elementor-divider__element">
+					<i aria-hidden="true" class="fas fa-map-marker-alt"></i></div>
+						</span>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-506ff68c elementor-widget elementor-widget-spacer" data-id="506ff68c" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-301b21c elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-id="301b21c" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1080" height="250" src="assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII.webp" class="attachment-full size-full wp-image-34094" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII.webp 1080w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-300x69.webp 300w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-1024x237.webp 1024w, assets/vendor/site/wp-content/uploads/2026/06/FRAME4-GREEN-PII-768x178.webp 768w" sizes="(max-width: 1080px) 100vw, 1080px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-left elementor-element elementor-element-508d5cf6 elementor-absolute fla1 elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="508d5cf6" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-right elementor-element elementor-element-5ebe793f elementor-absolute fla1 e-transform elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="5ebe793f" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="642" height="649" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp" class="attachment-full size-full wp-image-34082" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII.webp 642w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A2-GREEN-PII-297x300.webp 297w" sizes="(max-width: 642px) 100vw, 642px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-out elementor-element elementor-element-572a1ab elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="572a1ab" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1080" height="463" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII.webp" class="attachment-full size-full wp-image-34096" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII.webp 1080w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-300x129.webp 300w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-1024x439.webp 1024w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA6-GREEN-PII-768x329.webp 768w" sizes="(max-width: 1080px) 100vw, 1080px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-left elementor-element elementor-element-51085f2b elementor-absolute flb1 elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="51085f2b" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-bottom-right elementor-element elementor-element-5fb0ce25 elementor-absolute flb1 e-transform elementor-widget__width-inherit elementor-widget elementor-widget-image" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="5fb0ce25" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;,&quot;_transform_flipX_effect&quot;:&quot;transform&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="333" height="418" src="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp" class="attachment-full size-full wp-image-34085" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII.webp 333w, assets/vendor/site/wp-content/uploads/2026/06/BUNGA-A3-GREEN-PII-239x300.webp 239w" sizes="(max-width: 333px) 100vw, 333px" />															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-6d4d5997 e-con-full ls-section e-flex e-con e-child" data-id="6d4d5997" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-246eca3f elementor-widget elementor-widget-spacer" data-id="246eca3f" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-4b4f2cea elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="4b4f2cea" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Love Story</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-4f1b7f7e elementor-widget elementor-widget-spacer" data-id="4f1b7f7e" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-7a3396c4 ayat elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="7a3396c4" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1023" height="1023" src="assets/vendor/site/wp-content/uploads/2026/06/25KN154_AWAL-Copy-e1761191408395.jpg" class="attachment-full size-full wp-image-34100" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/25KN154_AWAL-Copy-e1761191408395.jpg 1023w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AWAL-Copy-e1761191408395-300x300.jpg 300w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AWAL-Copy-e1761191408395-150x150.jpg 150w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AWAL-Copy-e1761191408395-768x768.jpg 768w" sizes="(max-width: 1023px) 100vw, 1023px" />															</div>
+				</div>
+				<div class="elementor-element elementor-element-451d76b5 elementor-widget elementor-widget-spacer" data-id="451d76b5" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-a6ce717 ls-con idb-tl-title-align-center idb-tl-desc-align-center elementor-widget elementor-widget-bisdev_timeline" data-id="a6ce717" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_timeline.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-timeline idb-timeline--effect-zoom-up idb-timeline--content-only"
+                          data-reveal-offset="100"
+             data-reveal-delay="180"
+             data-reveal-duration="2500"
+             style="--idb-tl-reveal-delay: 180ms; --idb-tl-reveal-duration: 2500ms;"
+             >
+            <div class="idb-timeline__list">
+                                                                                        <div class="idb-timeline__item">
+                                                <div class="idb-timeline__content idb-reveal idb-ef zoom-up"
+                                                          data-reveal-offset="100"
+                             data-reveal-duration="2500"
+                             data-reveal-delay="0"
+                             style="transition-duration: 2500ms;"
+                             >
+                                                                                        <h3 class="idb-timeline__title">Awal Cerita</h3>
+                                                                                        <div class="idb-timeline__desc"><span class="niku-multiline">Berawal dari pertemuan sederhana, kami saling mengenal dan mulai berbagi banyak cerita. Tanpa disadari, kebersamaan itu tumbuh menjadi rasa nyaman yang semakin kuat dari hari ke hari.</span></div>
+                                                    </div>
+                    </div>
+                                                        <div class="idb-timeline__item">
+                                                <div class="idb-timeline__content idb-reveal idb-ef zoom-up"
+                                                          data-reveal-offset="100"
+                             data-reveal-duration="2500"
+                             data-reveal-delay="180"
+                             style="transition-duration: 2500ms; transition-delay: 180ms;"
+                             >
+                                                                                        <h3 class="idb-timeline__title">Lamaran</h3>
+                                                                                        <div class="idb-timeline__desc"><span class="niku-multiline">Dengan niat yang tulus dan restu keluarga, kami memutuskan untuk melangkah ke tahap yang lebih serius. Momen lamaran menjadi awal dari perjalanan baru yang penuh harapan dan doa baik.</span></div>
+                                                    </div>
+                    </div>
+                                                        <div class="idb-timeline__item">
+                                                <div class="idb-timeline__content idb-reveal idb-ef zoom-up"
+                                                          data-reveal-offset="100"
+                             data-reveal-duration="2500"
+                             data-reveal-delay="360"
+                             style="transition-duration: 2500ms; transition-delay: 360ms;"
+                             >
+                                                                                        <h3 class="idb-timeline__title">Pernikahan</h3>
+                                                                                        <div class="idb-timeline__desc"><span class="niku-multiline">Kini kami sampai pada hari yang kami nantikan, hari di mana dua hati dipersatukan dalam ikatan suci pernikahan. Semoga langkah ini menjadi awal kehidupan baru yang penuh cinta, kebahagiaan, dan keberkahan.</span></div>
+                                                    </div>
+                    </div>
+                            </div>
         </div>
-        <svg class="floral-divider opening-footer-sprig" viewBox="0 0 180 48" aria-hidden="true">
-            <path d="M90 5v26m0-11c-10 1-18 7-21 16 11-1 19-7 21-16Zm0-5c10 1 18 7 21 16-11-1-19-7-21-16Zm0 16c-8 7-8 15 0 21 8-6 8-14 0-21ZM41 6h49m49 0H90m-30 0c7 8 13 8 19 0-6-8-12-8-19 0Zm78 0c-7 8-13 8-19 0 6-8 12-8 19 0Z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-2ec959e0 elementor-widget elementor-widget-spacer" data-id="2ec959e0" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-7041a520 elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-id="7041a520" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1837" height="134" src="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png" class="attachment-full size-full wp-image-34089" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png 1837w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-300x22.png 300w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1024x75.png 1024w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-768x56.png 768w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1536x112.png 1536w" sizes="(max-width: 1837px) 100vw, 1837px" />															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-255b9539 e-con-full e-flex e-con e-child" data-id="255b9539" data-element_type="container" data-e-type="container">
+				<div class="elementor-element elementor-element-7d5b339a elementor-widget elementor-widget-spacer" data-id="7d5b339a" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-65556e1 elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="65556e1" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Galeri Foto</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5a970128 elementor-widget elementor-widget-spacer" data-id="5a970128" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-51ded982 elementor-widget__width-inherit elementor-widget elementor-widget-bisdev_invite_video" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="51ded982" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_invite_video.default">
+				<div class="elementor-widget-container">
+					        <div class="bisdev-invite-video" data-video-type="youtube" data-duck-music="1" data-biv-id="bisdev-invite-video-51ded982">
+            <div class="bisdev-invite-video__inner">
+                <iframe id="bisdev-invite-video-51ded982" class="bisdev-invite-video__iframe"
+                    src="https://www.youtube-nocookie.com/embed/8h7pbb4A4JI?playsinline=1&amp;rel=0&amp;iv_load_policy=3&amp;modestbranding=1&amp;autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=8h7pbb4A4JI&amp;enablejsapi=1&amp;origin=https%3A%2F%2Finv.punakawandigital.id"
+                    title="Video undangan"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen
+                    loading="lazy"></iframe>
+            </div>
+        </div>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-89b880a elementor-widget elementor-widget-gallery" data-id="89b880a" data-element_type="widget" data-e-type="widget" data-settings="{&quot;gallery_layout&quot;:&quot;justified&quot;,&quot;ideal_row_height&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:300,&quot;sizes&quot;:[]},&quot;ideal_row_height_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:300,&quot;sizes&quot;:[]},&quot;ideal_row_height_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:400,&quot;sizes&quot;:[]},&quot;gap&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;gap_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;gap_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;link_to&quot;:&quot;file&quot;,&quot;content_hover_animation&quot;:&quot;fade-in&quot;}" data-widget_type="gallery.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-gallery__container">
+							<a class="e-gallery-item elementor-gallery-item elementor-animated-content" href="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-3-e1761191599275.jpg" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="89b880a" data-elementor-lightbox-title="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-3-e1761191599275.jpg" data-e-action-hash="#elementor-action%3Aaction%3Dlightbox%26settings%3DeyJpZCI6MzQxMDIsInVybCI6Imh0dHBzOlwvXC9pbnYucHVuYWthd2FuZGlnaXRhbC5pZFwvd3AtY29udGVudFwvdXBsb2Fkc1wvMjAyNlwvMDZcLzI1S04xNTRfMi0zLWUxNzYxMTkxNTk5Mjc1LmpwZyIsInNsaWRlc2hvdyI6Ijg5Yjg4MGEifQ%3D%3D">
+					<div class="e-gallery-image elementor-gallery-item__image" data-thumbnail="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-3-e1761191599275.jpg" data-width="885" data-height="1535" aria-label="" role="img" style="background-image: url('assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-3-e1761191599275.jpg');"></div>
+														</a>
+							<a class="e-gallery-item elementor-gallery-item elementor-animated-content" href="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-1.jpg" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="89b880a" data-elementor-lightbox-title="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-1.jpg" data-e-action-hash="#elementor-action%3Aaction%3Dlightbox%26settings%3DeyJpZCI6MzQxMDQsInVybCI6Imh0dHBzOlwvXC9pbnYucHVuYWthd2FuZGlnaXRhbC5pZFwvd3AtY29udGVudFwvdXBsb2Fkc1wvMjAyNlwvMDZcLzI1S04xNTRfMS0xLmpwZyIsInNsaWRlc2hvdyI6Ijg5Yjg4MGEifQ%3D%3D">
+					<div class="e-gallery-image elementor-gallery-item__image" data-thumbnail="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-1.jpg" data-width="1024" data-height="1535" aria-label="" role="img" style="background-image: url('assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-1.jpg');"></div>
+														</a>
+							<a class="e-gallery-item elementor-gallery-item elementor-animated-content" href="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-2.jpg" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="89b880a" data-elementor-lightbox-title="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-2.jpg" data-e-action-hash="#elementor-action%3Aaction%3Dlightbox%26settings%3DeyJpZCI6MzQxMDYsInVybCI6Imh0dHBzOlwvXC9pbnYucHVuYWthd2FuZGlnaXRhbC5pZFwvd3AtY29udGVudFwvdXBsb2Fkc1wvMjAyNlwvMDZcLzI1S04xNTRfMS0yLmpwZyIsInNsaWRlc2hvdyI6Ijg5Yjg4MGEifQ%3D%3D">
+					<div class="e-gallery-image elementor-gallery-item__image" data-thumbnail="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-2.jpg" data-width="1024" data-height="1535" aria-label="" role="img" style="background-image: url('assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-2.jpg');"></div>
+														</a>
+							<a class="e-gallery-item elementor-gallery-item elementor-animated-content" href="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-3.jpg" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="89b880a" data-elementor-lightbox-title="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-3.jpg" data-e-action-hash="#elementor-action%3Aaction%3Dlightbox%26settings%3DeyJpZCI6MzQxMDcsInVybCI6Imh0dHBzOlwvXC9pbnYucHVuYWthd2FuZGlnaXRhbC5pZFwvd3AtY29udGVudFwvdXBsb2Fkc1wvMjAyNlwvMDZcLzI1S04xNTRfMS0zLmpwZyIsInNsaWRlc2hvdyI6Ijg5Yjg4MGEifQ%3D%3D">
+					<div class="e-gallery-image elementor-gallery-item__image" data-thumbnail="assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-3.jpg" data-width="1024" data-height="1535" aria-label="" role="img" style="background-image: url('assets/vendor/site/wp-content/uploads/2026/06/25KN154_1-3.jpg');"></div>
+														</a>
+							<a class="e-gallery-item elementor-gallery-item elementor-animated-content" href="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-1.jpg" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="89b880a" data-elementor-lightbox-title="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-1.jpg" data-e-action-hash="#elementor-action%3Aaction%3Dlightbox%26settings%3DeyJpZCI6MzQxMDksInVybCI6Imh0dHBzOlwvXC9pbnYucHVuYWthd2FuZGlnaXRhbC5pZFwvd3AtY29udGVudFwvdXBsb2Fkc1wvMjAyNlwvMDZcLzI1S04xNTRfMi0xLmpwZyIsInNsaWRlc2hvdyI6Ijg5Yjg4MGEifQ%3D%3D">
+					<div class="e-gallery-image elementor-gallery-item__image" data-thumbnail="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-1.jpg" data-width="1024" data-height="1535" aria-label="" role="img" style="background-image: url('assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-1.jpg');"></div>
+														</a>
+							<a class="e-gallery-item elementor-gallery-item elementor-animated-content" href="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-2.jpg" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="89b880a" data-elementor-lightbox-title="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-2.jpg" data-e-action-hash="#elementor-action%3Aaction%3Dlightbox%26settings%3DeyJpZCI6MzQwNzMsInVybCI6Imh0dHBzOlwvXC9pbnYucHVuYWthd2FuZGlnaXRhbC5pZFwvd3AtY29udGVudFwvdXBsb2Fkc1wvMjAyNlwvMDZcLzI1S04xNTRfMi0yLmpwZyIsInNsaWRlc2hvdyI6Ijg5Yjg4MGEifQ%3D%3D">
+					<div class="e-gallery-image elementor-gallery-item__image" data-thumbnail="assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-2.jpg" data-width="1024" data-height="1535" aria-label="" role="img" style="background-image: url('assets/vendor/site/wp-content/uploads/2026/06/25KN154_2-2.jpg');"></div>
+														</a>
+					</div>
+					</div>
+				</div>
+		<div class="elementor-element elementor-element-19519218 stream-con e-flex e-con-boxed e-con e-child" data-id="19519218" data-element_type="container" data-e-type="container">
+					<div class="e-con-inner">
+				<div class="elementor-element elementor-element-54916e6e elementor-widget elementor-widget-spacer" data-id="54916e6e" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-f1a45bf elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="f1a45bf" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Live Streaming</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-44e6e3d elementor-widget__width-inherit elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="44e6e3d" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Kami mengundang Bapak/Ibu/Saudara/i untuk menyaksikan pernikahan kami secara virtual yang disiarkan langsung melalui media sosial di bawah ini								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-5069ebde elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="5069ebde" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Senin, 28 Desember 2026								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-19e1f09c elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="19e1f09c" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Pukul : 08.00 WIB								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-4744311e elementor-widget elementor-widget-bisdev_social_icons" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="4744311e" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_social_icons.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-social-icons is-auto-columns is-streaming-buttons is-shape-circle" style="--idb-loc-btn-text:#FFFFFF;">
+                                            <a
+                    class="idb-social-icons__item elementor-animation-grow"
+                    href="https://www.instagram.com/"
+                    aria-label="Instagram"
+                    title="Instagram"
+                    style=""
+                                        target="_blank"                    rel="nofollow noopener noreferrer"                >
+                    <i class="fab fa-instagram" aria-hidden="true"></i>                                                                    <span class="idb-social-icons__text">@Habib</span>
+                                    </a>
+                    </div>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-14f51f3f elementor-widget elementor-widget-spacer" data-id="14f51f3f" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+					</div>
+				</div>
+				<div class="elementor-element elementor-element-68667311 elementor-widget elementor-widget-spacer" data-id="68667311" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="elementor-element elementor-element-653aa8f2 elementor-absolute elementor-widget__width-inherit elementor-widget elementor-widget-image" data-id="653aa8f2" data-element_type="widget" data-e-type="widget" data-settings="{&quot;_position&quot;:&quot;absolute&quot;}" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img loading="lazy" decoding="async" width="1837" height="134" src="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png" class="attachment-full size-full wp-image-34089" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740.png 1837w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-300x22.png 300w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1024x75.png 1024w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-768x56.png 768w, assets/vendor/site/wp-content/uploads/2026/06/FRAME6-GREEN-PII-e1761186695740-1536x112.png 1536w" sizes="(max-width: 1837px) 100vw, 1837px" />															</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-51cdfcef e-con-full e-flex e-con e-child" data-id="51cdfcef" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+		<div class="elementor-element elementor-element-74f2aea7 e-con-full amplop-section e-flex e-con e-child" data-id="74f2aea7" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="elementor-element elementor-element-2942f7eb elementor-widget elementor-widget-spacer" data-id="2942f7eb" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-6a410462 elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="6a410462" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Amplop Digital</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-973f656 elementor-widget__width-inherit elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="973f656" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Doa restu Anda merupakan karunia yang sangat berarti bagi kami, dan jika memberi adalah ungkapan tanda kasih, Anda dapat memberi kado secara cashless.								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-2b80911c elementor-align-center elementor-widget elementor-widget-button" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="2b80911c" data-element_type="widget" data-e-type="widget" id="klik" data-widget_type="button.default">
+				<div class="elementor-widget-container">
+									<div class="elementor-button-wrapper">
+					<a class="elementor-button elementor-size-xs" role="button">
+						<span class="elementor-button-content-wrapper">
+									<span class="elementor-button-text">Klik disini</span>
+					</span>
+					</a>
+				</div>
+								</div>
+				</div>
+		<div class="elementor-element elementor-element-2547c74a e-con-full e-flex e-con e-child" data-id="2547c74a" data-element_type="container" data-e-type="container" id="amplop">
+				<div class="elementor-element elementor-element-73170a48 elementor-widget elementor-widget-bisdev_copy_rekening" data-id="73170a48" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_copy_rekening.default">
+				<div class="elementor-widget-container">
+					<script>
+            (function(){
+              if (window.__idbBisdevEntranceZoomInit) return;
+              window.__idbBisdevEntranceZoomInit = true;
+              var selVisible = ".idb-copy-rek.elementor-invisible[data-settings], .idb-kirim-hadiah.elementor-invisible[data-settings]";
+              var selAll = ".idb-copy-rek[data-settings], .idb-kirim-hadiah[data-settings]";
+              var zoomCycle = 1;
+              function parseSettings(el){
+                var raw = el.getAttribute("data-settings") || "{}";
+                try { return JSON.parse(raw); } catch(e){ return {}; }
+              }
+              function applyZoom(scope){
+                var root = scope && scope.querySelectorAll ? scope : document;
+                var items = root.querySelectorAll(selVisible);
+                items.forEach(function(el){
+                  if ((el.__idbZoomCycleApplied || 0) >= zoomCycle) return;
+                  var st = parseSettings(el);
+                  var anim = (st._animation || "zoomIn").toString();
+                  var delay = parseInt(st._animation_delay || 0, 10) || 0;
+                  if (!el.__idbEverShown) delay = Math.max(0, delay - 20);
+                  if (el.offsetParent === null) return;
+                  el.__idbZoomCycleApplied = zoomCycle;
+                  el.__idbEverShown = true;
+                  setTimeout(function(){
+                    if ((el.__idbZoomCycleApplied || 0) !== zoomCycle) return;
+                    el.classList.remove("elementor-invisible");
+                    el.classList.add("animated", anim);
+                  }, Math.max(0, delay));
+                });
+              }
+              function replayZoom(scope){
+                var root = scope && scope.querySelectorAll ? scope : document;
+                var items = root.querySelectorAll(selAll);
+                zoomCycle += 1;
+                items.forEach(function(el){
+                  if (el.offsetParent === null) return;
+                  el.classList.remove("animated", "zoomIn");
+                  el.classList.add("elementor-invisible");
+                  el.__idbZoomCycleApplied = 0;
+                });
+                setTimeout(function(){ schedule(root); }, 40);
+              }
+              function syncVisibleStateAndReplay(scope){
+                var root = scope && scope.querySelectorAll ? scope : document;
+                var items = root.querySelectorAll(selAll);
+                var shouldReplay = false;
+                items.forEach(function(el){
+                  var isVisible = (el.offsetParent !== null);
+                  if (isVisible && !el.__idbWasVisible) {
+                    el.__idbWasVisible = true;
+                    shouldReplay = true;
+                  } else if (!isVisible && el.__idbWasVisible) {
+                    el.__idbWasVisible = false;
+                  }
+                });
+                if (shouldReplay) replayZoom(root);
+              }
+              var raf = 0;
+              function schedule(scope){
+                if (raf) cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(function(){ applyZoom(scope); });
+              }
+              document.addEventListener("DOMContentLoaded", function(){ schedule(document); });
+              window.addEventListener("load", function(){ schedule(document); });
+              document.addEventListener("app:content-ready", function(){ schedule(document); });
+              document.addEventListener("app:navigated", function(){ schedule(document); });
+              document.addEventListener("idb:rekening-shown", function(){ replayZoom(document); });
+              if (window.elementorFrontend && window.elementorFrontend.hooks) {
+                window.elementorFrontend.hooks.addAction("frontend/element_ready/global", function($scope){
+                  try { schedule(($scope && $scope[0]) ? $scope[0] : document); } catch(e){ schedule(document); }
+                });
+              }
+              var obs = new MutationObserver(function(){
+                schedule(document);
+                syncVisibleStateAndReplay(document);
+              });
+              obs.observe(document.documentElement, { attributes:true, childList:true, subtree:true, attributeFilter:["class","style"] });
+              syncVisibleStateAndReplay(document);
+              schedule(document);
+            })();
+            </script>                                <div class="idb-copy-rek idb-copy-rek--auto elementor-invisible is-stack is-btn-right is-hide-bankname" id="idb-copy-rek-73170a48-0"
+                     data-settings='{&quot;_animation&quot;:&quot;zoomIn&quot;,&quot;_animation_delay&quot;:20}'
+                     data-copy="12345678"
+                     data-success="Tersalin."
+                     data-fail="Gagal menyalin. Coba lagi."
+                     data-trigger-text="0"
+                     data-trigger-btn="1">
+                    <div class="idb-copy-rek__box">
+                        <div class="idb-copy-rek__info">
+                                                            <div class="idb-copy-rek__label is-logo-right" >
+                                                                                                                                                                <span class="idb-copy-rek__banklogo" style="margin-left:auto;"><img decoding="async" src="assets/vendor/site/wp-content/uploads/2026/06/BCA_5770.webp" alt="" loading="lazy"></span>
+                                                                                                            </div>
+                                                        
+                            <div class="idb-copy-rek__number "
+                                 >
+                                                                    <div class="idb-copy-rek__chipimg"><img decoding="async" src="assets/vendor/site/wp-content/uploads/2026/06/chip-atm-1-2-1-1-1-3-1-1.png" alt="" loading="lazy"></div>
+                                                                <div class="idb-copy-rek__numtext"><span class="no-rekening-marker" data-gift-index="0">12345678</span></div>
+                            </div>
+
+                                                            <div class="idb-copy-rek__name">Habib</div>
+                                                    </div>
+
+                                                    <button type="button" class="idb-copy-rek__btn">
+                                                                    <span class="idb-copy-rek__icon idb-is-left"><i aria-hidden="true" class="fas fa-copy"></i></span>
+                                                                <span class="idb-copy-rek__btntext">Copy</span>
+                                                            </button>
+                                                <div class="idb-copy-rek__toast" aria-live="polite" aria-atomic="true"></div>
+                    </div>
+                </div>
+                				</div>
+				</div>
+				<div class="elementor-element elementor-element-f13fb2 elementor-widget elementor-widget-bisdev_kirim_hadiah" data-id="f13fb2" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_kirim_hadiah.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-kirim-hadiah idb-kirim-hadiah--auto elementor-invisible" data-settings="{&quot;_animation&quot;:&quot;zoomIn&quot;,&quot;_animation_delay&quot;:20}">
+            <div class="idb-kirim-hadiah__box">
+                <div class="idb-kirim-hadiah__icon" aria-hidden="true">
+                    <i aria-hidden="true" class="fas fa-gift"></i>                </div>
+
+                                    <div class="idb-kirim-hadiah__title">Kirim Hadiah</div>
+                
+                <div class="idb-kirim-hadiah__content">
+                                    <div class="idb-kirim-hadiah__line">
+                        <span class="idb-kirim-hadiah__label">Nama Penerima</span>
+                        <span class="idb-kirim-hadiah__sep">:</span>
+                        <span class="idb-kirim-hadiah__value">Habib Yulianto</span>
+                    </div>
+                
+                                    <div class="idb-kirim-hadiah__line">
+                        <span class="idb-kirim-hadiah__label">No. HP</span>
+                        <span class="idb-kirim-hadiah__sep">:</span>
+                        <span class="idb-kirim-hadiah__value">1234567890</span>
+                    </div>
+                
+                                    <div class="idb-kirim-hadiah__line idb-kirim-hadiah__line--alamat">
+                        <span class="idb-kirim-hadiah__label">Alamat</span>
+                        <span class="idb-kirim-hadiah__sep">:</span>
+                        <span class="idb-kirim-hadiah__value">Ds Pagu Kec.Wates Kab. Kediri</span>
+                    </div>
+                                                    </div>
+
+                            </div>
+        </div>
+        				</div>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-5a966266 elementor-widget elementor-widget-spacer" data-id="5a966266" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-6fb9756 e-con-full e-flex e-con e-child" data-id="6fb9756" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="elementor-element elementor-element-16e5d9e8 elementor-widget elementor-widget-spacer" data-id="16e5d9e8" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-62940b0e elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="62940b0e" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Ucapkan Sesuatu</h2>				</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-479035bf elementor-widget__width-inherit elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="479035bf" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Berikan Ucapan &amp; Doa Restu								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-up elementor-element elementor-element-6703527a elementor-widget elementor-widget-niku-rsvp" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="6703527a" data-element_type="widget" data-e-type="widget" data-widget_type="niku-rsvp.default">
+				<div class="elementor-widget-container">
+					        <div class="rsvp-card"
+             data-post-id="32120"
+             data-ui-tr="0"
+             data-suffix-jumlah-tamu="Tamu"
+             data-msg-success="Terima kasih, ucapan kamu sudah terkirim."
+             data-msg-invalid-link="Mohon maaf! Khusus untuk tamu undangan."
+             data-msg-name-required="Nama wajib diisi."
+             data-msg-content-required="Ucapan / doa wajib diisi."
+             data-msg-content-max="Ucapan maksimal 1000 karakter."
+             data-msg-max-length="1000"
+             data-msg-presence-required="Pilih konfirmasi kehadiran."
+             data-msg-delete-confirm="Hapus komentar ini?"
+             data-msg-delete-fail="Gagal menghapus komentar."
+             data-msg-connection="Terjadi kesalahan koneksi. Coba lagi."
+             data-msg-page-fail="Gagal memuat halaman."
+             data-msg-invalid-response="Respon tidak valid."
+             data-msg-submit-fail="Gagal mengirim ucapan."
+             data-msg-just-now="Baru saja"
+             data-guest-to=""
+             data-comment-permission="db_only"
+             data-allow-public="0"
+             data-use-presence="1"
+             data-show-avatar="1"
+             data-show-jumlah-tamu="0"
+             data-label-jumlah-tamu="Jumlah Tamu"
+             data-max-jumlah-tamu="2"
+             data-editor-preview="0"
+             data-static-error="Tautan undangan tidak valid. Gunakan tautan pribadi yang diberikan kepada Anda."
+
+             data-send-wa="0"
+             data-wa-number=""
+
+             data-wa-popup="0"
+             data-wa-popup-title="Konfirmasi WhatsApp"
+             data-wa-popup-text="Apakah Anda ingin melanjutkan mengirim konfirmasi melalui WhatsApp?"
+             data-wa-popup-yes="Ya, Kirim"
+             data-wa-popup-no="Batal"
+
+             data-can-delete="0"
+             data-del-nonce="b068ee17ab"
+             data-show-stats="0"
+        >
+
+
+                            <!-- Template ikon avatar default -->
+                <span class="rsvp-ava-template" style="display:none;">
+                    <svg class="rsvp-ava-icon rsvp-ava-icon-inline" focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" role="img" aria-label="user circle icon">
+  <circle cx="248" cy="256" r="248" fill="currentColor"/>
+  <circle cx="248" cy="192" r="80" class="rsvp-ava-silhouette"/>
+  <path d="M248 296c-68.48 0-124 48.14-124 107.52V408c34.32 34.97 82.14 56 124 56s89.68-21.03 124-56v-4.48C372 344.14 316.48 296 248 296z" class="rsvp-ava-silhouette"/>
+</svg>
+                </span>
+            
+            <div class="rsvp-error-top" role="alert" style="display:none;">
+                Tautan undangan tidak valid. Gunakan tautan pribadi yang diberikan kepada Anda.
+            </div>
+
+            
+            <!-- FORM RSVP -->
+            <div class="rsvp-form">
+                <!-- Nama -->
+                <div class="rsvp-field">
+                <input
+                  type="text"
+                  class="rsvp-input"
+                  data-rsvp="name"
+                  placeholder="Nama Kamu"
+                  autocomplete="name"
+                  value=""
+                  readonly
+                  disabled
+                />
+
+                
+                <input type="text"
+                   data-rsvp="hp"
+                   tabindex="-1"
+                   autocomplete="nope"
+                   style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;"
+                   aria-hidden="true">
+
+                <div class="rsvp-error rsvp-error--name" role="alert" style="display:none"></div>
+                </div>
+
+                <!-- Ucapan -->
+                <div class="rsvp-field">
+                    <textarea
+                        class="rsvp-textarea"
+                        data-rsvp="message"
+                        rows="4"
+                        maxlength="1000"
+                        placeholder="Berikan Ucapan &amp; Do&#039;a"></textarea>
+                    <div class="rsvp-error rsvp-error--message" role="alert" style="display:none;"></div>
+                </div>
+
+                <!-- Konfirmasi Kehadiran -->
+                                    <div class="rsvp-field rsvp-presence">
+                        <div class="rsvp-presence-label">
+                            Konfirmasi Kehadiran ?                        </div>
+                        <div class="rsvp-pills" data-rsvp="presence">
+                            <button type="button"
+                                    class="rsvp-pill rsvp-pill--hadir"
+                                    data-rsvp-pill="hadir"
+                                    data-active="0">
+                                <span class="pill-icon"><img loading="lazy" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iSGFkaXIiPgogIDx0aXRsZT5IYWRpcjwvdGl0bGU+CiAgPHBhdGggZD0iTSA1MTIuMDAgNjIuMDAgTCA1MTUuOTYgNTcuNjkgTCA1MjAuMDAgNTMuODQgTCA1MjQuMDggNTAuODMgTCA1MjguMTcgNDguOTcgTCA1MzIuMjQgNDguNDQgTCA1MzYuMjUgNDkuMzIgTCA1NDAuMTYgNTEuNTMgTCA1NDMuOTYgNTQuODkgTCA1NDcuNjUgNTkuMDcgTCA1NTEuMjIgNjMuNzEgTCA1NTQuNzIgNjguMzggTCA1NTguMTggNzIuNjUgTCA1NjEuNjYgNzYuMTUgTCA1NjUuMjIgNzguNTcgTCA1NjguOTEgNzkuNzMgTCA1NzIuNzcgNzkuNTYgTCA1NzYuODQgNzguMTQgTCA1ODEuMTEgNzUuNjcgTCA1ODUuNTYgNzIuNDQgTCA1OTAuMTQgNjguODQgTCA1OTQuNzkgNjUuMjggTCA1OTkuNDMgNjIuMTkgTCA2MDMuOTcgNTkuOTQgTCA2MDguMzMgNTguODEgTCA2MTIuNDMgNTkuMDAgTCA2MTYuMjIgNjAuNTYgTCA2MTkuNjkgNjMuNDIgTCA2MjIuODYgNjcuMzggTCA2MjUuNzUgNzIuMTUgTCA2MjguNDcgNzcuMzMgTCA2MzEuMTAgODIuNTQgTCA2MzMuNzcgODcuMzQgTCA2MzYuNTkgOTEuMzkgTCA2MzkuNjcgOTQuNDAgTCA2NDMuMTEgOTYuMTggTCA2NDYuOTQgOTYuNjkgTCA2NTEuMTkgOTYuMDAgTCA2NTUuODMgOTQuMzAgTCA2NjAuNzcgOTEuODkgTCA2NjUuOTEgODkuMTQgTCA2NzEuMTEgODYuNDUgTCA2NzYuMjEgODQuMjEgTCA2ODEuMDggODIuNzcgTCA2ODUuNTYgODIuNDIgTCA2ODkuNTcgODMuMzIgTCA2OTMuMDMgODUuNTIgTCA2OTUuOTUgODguOTQgTCA2OTguMzggOTMuMzkgTCA3MDAuNDEgOTguNTggTCA3MDIuMTggMTA0LjE2IEwgNzAzLjg3IDEwOS43NCBMIDcwNS42NiAxMTQuOTQgTCA3MDcuNzQgMTE5LjQyIEwgNzEwLjI1IDEyMi45MSBMIDcxMy4zMiAxMjUuMjYgTCA3MTcuMDEgMTI2LjQzIEwgNzIxLjMyIDEyNi40OSBMIDcyNi4xNyAxMjUuNjIgTCA3MzEuNDYgMTI0LjExIEwgNzM3LjAwIDEyMi4yOSBMIDc0Mi41OSAxMjAuNTQgTCA3NDguMDEgMTE5LjIyIEwgNzUzLjA0IDExOC42NSBMIDc1Ny41MiAxMTkuMDkgTCA3NjEuMzEgMTIwLjY3IEwgNzY0LjM0IDEyMy40MyBMIDc2Ni42MiAxMjcuMzEgTCA3NjguMjQgMTMyLjExIEwgNzY5LjMzIDEzNy41OCBMIDc3MC4xMSAxNDMuMzggTCA3NzAuODAgMTQ5LjE3IEwgNzcxLjY3IDE1NC42MCBMIDc3Mi45MyAxNTkuMzcgTCA3NzQuODAgMTYzLjI1IEwgNzc3LjQyIDE2Ni4xMCBMIDc4MC44NSAxNjcuODkgTCA3ODUuMDggMTY4LjY5IEwgNzkwLjAyIDE2OC42OCBMIDc5NS40OCAxNjguMTEgTCA4MDEuMjUgMTY3LjI4IEwgODA3LjA2IDE2Ni41MyBMIDgxMi42MyAxNjYuMTcgTCA4MTcuNjggMTY2LjQ5IEwgODIyLjAyIDE2Ny42OSBMIDgyNS40NyAxNjkuOTAgTCA4MjcuOTggMTczLjE1IEwgODI5LjU2IDE3Ny4zNyBMIDgzMC4zMSAxODIuMzggTCA4MzAuNDQgMTg3Ljk1IEwgODMwLjIwIDE5My44MCBMIDgyOS44OCAxOTkuNjIgTCA4MjkuNzggMjA1LjEyIEwgODMwLjIwIDIxMC4wNCBMIDgzMS4zNyAyMTQuMTggTCA4MzMuNDUgMjE3LjQ0IEwgODM2LjUyIDIxOS44MCBMIDg0MC41NSAyMjEuMzMgTCA4NDUuNDEgMjIyLjE3IEwgODUwLjg5IDIyMi41NiBMIDg1Ni43MiAyMjIuNzUgTCA4NjIuNTcgMjIzLjAxIEwgODY4LjExIDIyMy42MyBMIDg3My4wNCAyMjQuODIgTCA4NzcuMTAgMjI2Ljc1IEwgODgwLjEyIDIyOS41MyBMIDg4Mi4wMiAyMzMuMTcgTCA4ODIuODQgMjM3LjU5IEwgODgyLjcyIDI0Mi42NiBMIDg4MS44NyAyNDguMTcgTCA4ODAuNjIgMjUzLjg5IEwgODc5LjI5IDI1OS41NyBMIDg3OC4yNCAyNjQuOTYgTCA4NzcuODAgMjY5Ljg4IEwgODc4LjI0IDI3NC4xNiBMIDg3OS43MiAyNzcuNzQgTCA4ODIuMzMgMjgwLjU5IEwgODg2LjAzIDI4Mi43OSBMIDg5MC42NyAyODQuNDcgTCA4OTYuMDEgMjg1LjgwIEwgOTAxLjcxIDI4Ny4wMCBMIDkwNy40MyAyODguMjggTCA5MTIuNzggMjg5Ljg1IEwgOTE3LjQyIDI5MS44NyBMIDkyMS4wOCAyOTQuNDkgTCA5MjMuNTcgMjk3Ljc1IEwgOTI0LjgyIDMwMS42NiBMIDkyNC44NiAzMDYuMTYgTCA5MjMuODUgMzExLjEzIEwgOTIyLjA3IDMxNi40MSBMIDkxOS44NCAzMjEuODIgTCA5MTcuNTUgMzI3LjE4IEwgOTE1LjU4IDMzMi4zMiBMIDkxNC4yOSAzMzcuMDggTCA5MTMuOTcgMzQxLjM3IEwgOTE0LjgxIDM0NS4xNSBMIDkxNi44OSAzNDguNDEgTCA5MjAuMTUgMzUxLjIzIEwgOTI0LjQzIDM1My42OCBMIDkyOS40NSAzNTUuOTIgTCA5MzQuODYgMzU4LjA5IEwgOTQwLjI3IDM2MC4zNCBMIDk0NS4yNiAzNjIuODIgTCA5NDkuNDkgMzY1LjYyIEwgOTUyLjY0IDM2OC44MyBMIDk1NC41MiAzNzIuNDcgTCA5NTUuMDcgMzc2LjU0IEwgOTU0LjMzIDM4MC45OCBMIDk1Mi40OCAzODUuNjkgTCA5NDkuODAgMzkwLjU5IEwgOTQ2LjY3IDM5NS41MyBMIDk0My40OCA0MDAuNDEgTCA5NDAuNjUgNDA1LjEzIEwgOTM4LjU1IDQwOS41OSBMIDkzNy40OSA0MTMuNzcgTCA5MzcuNjcgNDE3LjYzIEwgOTM5LjE0IDQyMS4yMSBMIDk0MS44NyA0MjQuNTQgTCA5NDUuNjUgNDI3LjcxIEwgOTUwLjIxIDQzMC43OCBMIDk1NS4xNiA0MzMuODYgTCA5NjAuMTAgNDM3LjAxIEwgOTY0LjU5IDQ0MC4zMiBMIDk2OC4yNiA0NDMuODEgTCA5NzAuODEgNDQ3LjUyIEwgOTcyLjAzIDQ1MS40NCBMIDk3MS44NiA0NTUuNTQgTCA5NzAuMzYgNDU5Ljc4IEwgOTY3LjcyIDQ2NC4xMCBMIDk2NC4yMyA0NjguNDUgTCA5NjAuMjkgNDcyLjc4IEwgOTU2LjMwIDQ3Ny4wMyBMIDk1Mi42OSA0ODEuMTggTCA5NDkuODYgNDg1LjIyIEwgOTQ4LjA5IDQ4OS4xNSBMIDk0Ny41OSA0OTIuOTggTCA5NDguNDIgNDk2Ljc2IEwgOTUwLjUyIDUwMC41MiBMIDk1My43MCA1MDQuMjkgTCA5NTcuNjYgNTA4LjExIEwgOTYyLjAwIDUxMi4wMCBMIDk2Ni4zMSA1MTUuOTYgTCA5NzAuMTYgNTIwLjAwIEwgOTczLjE3IDUyNC4wOCBMIDk3NS4wMyA1MjguMTcgTCA5NzUuNTYgNTMyLjI0IEwgOTc0LjY4IDUzNi4yNSBMIDk3Mi40NyA1NDAuMTYgTCA5NjkuMTEgNTQzLjk2IEwgOTY0LjkzIDU0Ny42NSBMIDk2MC4yOSA1NTEuMjIgTCA5NTUuNjIgNTU0LjcyIEwgOTUxLjM1IDU1OC4xOCBMIDk0Ny44NSA1NjEuNjYgTCA5NDUuNDMgNTY1LjIyIEwgOTQ0LjI3IDU2OC45MSBMIDk0NC40NCA1NzIuNzcgTCA5NDUuODYgNTc2Ljg0IEwgOTQ4LjMzIDU4MS4xMSBMIDk1MS41NiA1ODUuNTYgTCA5NTUuMTYgNTkwLjE0IEwgOTU4LjcyIDU5NC43OSBMIDk2MS44MSA1OTkuNDMgTCA5NjQuMDYgNjAzLjk3IEwgOTY1LjE5IDYwOC4zMyBMIDk2NS4wMCA2MTIuNDMgTCA5NjMuNDQgNjE2LjIyIEwgOTYwLjU4IDYxOS42OSBMIDk1Ni42MiA2MjIuODYgTCA5NTEuODUgNjI1Ljc1IEwgOTQ2LjY3IDYyOC40NyBMIDk0MS40NiA2MzEuMTAgTCA5MzYuNjYgNjMzLjc3IEwgOTMyLjYxIDYzNi41OSBMIDkyOS42MCA2MzkuNjcgTCA5MjcuODIgNjQzLjExIEwgOTI3LjMxIDY0Ni45NCBMIDkyOC4wMCA2NTEuMTkgTCA5MjkuNzAgNjU1LjgzIEwgOTMyLjExIDY2MC43NyBMIDkzNC44NiA2NjUuOTEgTCA5MzcuNTUgNjcxLjExIEwgOTM5Ljc5IDY3Ni4yMSBMIDk0MS4yMyA2ODEuMDggTCA5NDEuNTggNjg1LjU2IEwgOTQwLjY4IDY4OS41NyBMIDkzOC40OCA2OTMuMDMgTCA5MzUuMDYgNjk1Ljk1IEwgOTMwLjYxIDY5OC4zOCBMIDkyNS40MiA3MDAuNDEgTCA5MTkuODQgNzAyLjE4IEwgOTE0LjI2IDcwMy44NyBMIDkwOS4wNiA3MDUuNjYgTCA5MDQuNTggNzA3Ljc0IEwgOTAxLjA5IDcxMC4yNSBMIDg5OC43NCA3MTMuMzIgTCA4OTcuNTcgNzE3LjAxIEwgODk3LjUxIDcyMS4zMiBMIDg5OC4zOCA3MjYuMTcgTCA4OTkuODkgNzMxLjQ2IEwgOTAxLjcxIDczNy4wMCBMIDkwMy40NiA3NDIuNTkgTCA5MDQuNzggNzQ4LjAxIEwgOTA1LjM1IDc1My4wNCBMIDkwNC45MSA3NTcuNTIgTCA5MDMuMzMgNzYxLjMxIEwgOTAwLjU3IDc2NC4zNCBMIDg5Ni42OSA3NjYuNjIgTCA4OTEuODkgNzY4LjI0IEwgODg2LjQyIDc2OS4zMyBMIDg4MC42MiA3NzAuMTEgTCA4NzQuODMgNzcwLjgwIEwgODY5LjQwIDc3MS42NyBMIDg2NC42MyA3NzIuOTMgTCA4NjAuNzUgNzc0LjgwIEwgODU3LjkwIDc3Ny40MiBMIDg1Ni4xMSA3ODAuODUgTCA4NTUuMzEgNzg1LjA4IEwgODU1LjMyIDc5MC4wMiBMIDg1NS44OSA3OTUuNDggTCA4NTYuNzIgODAxLjI1IEwgODU3LjQ3IDgwNy4wNiBMIDg1Ny44MyA4MTIuNjMgTCA4NTcuNTEgODE3LjY4IEwgODU2LjMxIDgyMi4wMiBMIDg1NC4xMCA4MjUuNDcgTCA4NTAuODUgODI3Ljk4IEwgODQ2LjYzIDgyOS41NiBMIDg0MS42MiA4MzAuMzEgTCA4MzYuMDUgODMwLjQ0IEwgODMwLjIwIDgzMC4yMCBMIDgyNC4zOCA4MjkuODggTCA4MTguODggODI5Ljc4IEwgODEzLjk2IDgzMC4yMCBMIDgwOS44MiA4MzEuMzcgTCA4MDYuNTYgODMzLjQ1IEwgODA0LjIwIDgzNi41MiBMIDgwMi42NyA4NDAuNTUgTCA4MDEuODMgODQ1LjQxIEwgODAxLjQ0IDg1MC44OSBMIDgwMS4yNSA4NTYuNzIgTCA4MDAuOTkgODYyLjU3IEwgODAwLjM3IDg2OC4xMSBMIDc5OS4xOCA4NzMuMDQgTCA3OTcuMjUgODc3LjEwIEwgNzk0LjQ3IDg4MC4xMiBMIDc5MC44MyA4ODIuMDIgTCA3ODYuNDEgODgyLjg0IEwgNzgxLjM0IDg4Mi43MiBMIDc3NS44MyA4ODEuODcgTCA3NzAuMTEgODgwLjYyIEwgNzY0LjQzIDg3OS4yOSBMIDc1OS4wNCA4NzguMjQgTCA3NTQuMTIgODc3LjgwIEwgNzQ5Ljg0IDg3OC4yNCBMIDc0Ni4yNiA4NzkuNzIgTCA3NDMuNDEgODgyLjMzIEwgNzQxLjIxIDg4Ni4wMyBMIDczOS41MyA4OTAuNjcgTCA3MzguMjAgODk2LjAxIEwgNzM3LjAwIDkwMS43MSBMIDczNS43MiA5MDcuNDMgTCA3MzQuMTUgOTEyLjc4IEwgNzMyLjEzIDkxNy40MiBMIDcyOS41MSA5MjEuMDggTCA3MjYuMjUgOTIzLjU3IEwgNzIyLjM0IDkyNC44MiBMIDcxNy44NCA5MjQuODYgTCA3MTIuODcgOTIzLjg1IEwgNzA3LjU5IDkyMi4wNyBMIDcwMi4xOCA5MTkuODQgTCA2OTYuODIgOTE3LjU1IEwgNjkxLjY4IDkxNS41OCBMIDY4Ni45MiA5MTQuMjkgTCA2ODIuNjMgOTEzLjk3IEwgNjc4Ljg1IDkxNC44MSBMIDY3NS41OSA5MTYuODkgTCA2NzIuNzcgOTIwLjE1IEwgNjcwLjMyIDkyNC40MyBMIDY2OC4wOCA5MjkuNDUgTCA2NjUuOTEgOTM0Ljg2IEwgNjYzLjY2IDk0MC4yNyBMIDY2MS4xOCA5NDUuMjYgTCA2NTguMzggOTQ5LjQ5IEwgNjU1LjE3IDk1Mi42NCBMIDY1MS41MyA5NTQuNTIgTCA2NDcuNDYgOTU1LjA3IEwgNjQzLjAyIDk1NC4zMyBMIDYzOC4zMSA5NTIuNDggTCA2MzMuNDEgOTQ5LjgwIEwgNjI4LjQ3IDk0Ni42NyBMIDYyMy41OSA5NDMuNDggTCA2MTguODcgOTQwLjY1IEwgNjE0LjQxIDkzOC41NSBMIDYxMC4yMyA5MzcuNDkgTCA2MDYuMzcgOTM3LjY3IEwgNjAyLjc5IDkzOS4xNCBMIDU5OS40NiA5NDEuODcgTCA1OTYuMjkgOTQ1LjY1IEwgNTkzLjIyIDk1MC4yMSBMIDU5MC4xNCA5NTUuMTYgTCA1ODYuOTkgOTYwLjEwIEwgNTgzLjY4IDk2NC41OSBMIDU4MC4xOSA5NjguMjYgTCA1NzYuNDggOTcwLjgxIEwgNTcyLjU2IDk3Mi4wMyBMIDU2OC40NiA5NzEuODYgTCA1NjQuMjIgOTcwLjM2IEwgNTU5LjkwIDk2Ny43MiBMIDU1NS41NSA5NjQuMjMgTCA1NTEuMjIgOTYwLjI5IEwgNTQ2Ljk3IDk1Ni4zMCBMIDU0Mi44MiA5NTIuNjkgTCA1MzguNzggOTQ5Ljg2IEwgNTM0Ljg1IDk0OC4wOSBMIDUzMS4wMiA5NDcuNTkgTCA1MjcuMjQgOTQ4LjQyIEwgNTIzLjQ4IDk1MC41MiBMIDUxOS43MSA5NTMuNzAgTCA1MTUuODkgOTU3LjY2IEwgNTEyLjAwIDk2Mi4wMCBMIDUwOC4wNCA5NjYuMzEgTCA1MDQuMDAgOTcwLjE2IEwgNDk5LjkyIDk3My4xNyBMIDQ5NS44MyA5NzUuMDMgTCA0OTEuNzYgOTc1LjU2IEwgNDg3Ljc1IDk3NC42OCBMIDQ4My44NCA5NzIuNDcgTCA0ODAuMDQgOTY5LjExIEwgNDc2LjM1IDk2NC45MyBMIDQ3Mi43OCA5NjAuMjkgTCA0NjkuMjggOTU1LjYyIEwgNDY1LjgyIDk1MS4zNSBMIDQ2Mi4zNCA5NDcuODUgTCA0NTguNzggOTQ1LjQzIEwgNDU1LjA5IDk0NC4yNyBMIDQ1MS4yMyA5NDQuNDQgTCA0NDcuMTYgOTQ1Ljg2IEwgNDQyLjg5IDk0OC4zMyBMIDQzOC40NCA5NTEuNTYgTCA0MzMuODYgOTU1LjE2IEwgNDI5LjIxIDk1OC43MiBMIDQyNC41NyA5NjEuODEgTCA0MjAuMDMgOTY0LjA2IEwgNDE1LjY3IDk2NS4xOSBMIDQxMS41NyA5NjUuMDAgTCA0MDcuNzggOTYzLjQ0IEwgNDA0LjMxIDk2MC41OCBMIDQwMS4xNCA5NTYuNjIgTCAzOTguMjUgOTUxLjg1IEwgMzk1LjUzIDk0Ni42NyBMIDM5Mi45MCA5NDEuNDYgTCAzOTAuMjMgOTM2LjY2IEwgMzg3LjQxIDkzMi42MSBMIDM4NC4zMyA5MjkuNjAgTCAzODAuODkgOTI3LjgyIEwgMzc3LjA2IDkyNy4zMSBMIDM3Mi44MSA5MjguMDAgTCAzNjguMTcgOTI5LjcwIEwgMzYzLjIzIDkzMi4xMSBMIDM1OC4wOSA5MzQuODYgTCAzNTIuODkgOTM3LjU1IEwgMzQ3Ljc5IDkzOS43OSBMIDM0Mi45MiA5NDEuMjMgTCAzMzguNDQgOTQxLjU4IEwgMzM0LjQzIDk0MC42OCBMIDMzMC45NyA5MzguNDggTCAzMjguMDUgOTM1LjA2IEwgMzI1LjYyIDkzMC42MSBMIDMyMy41OSA5MjUuNDIgTCAzMjEuODIgOTE5Ljg0IEwgMzIwLjEzIDkxNC4yNiBMIDMxOC4zNCA5MDkuMDYgTCAzMTYuMjYgOTA0LjU4IEwgMzEzLjc1IDkwMS4wOSBMIDMxMC42OCA4OTguNzQgTCAzMDYuOTkgODk3LjU3IEwgMzAyLjY4IDg5Ny41MSBMIDI5Ny44MyA4OTguMzggTCAyOTIuNTQgODk5Ljg5IEwgMjg3LjAwIDkwMS43MSBMIDI4MS40MSA5MDMuNDYgTCAyNzUuOTkgOTA0Ljc4IEwgMjcwLjk2IDkwNS4zNSBMIDI2Ni40OCA5MDQuOTEgTCAyNjIuNjkgOTAzLjMzIEwgMjU5LjY2IDkwMC41NyBMIDI1Ny4zOCA4OTYuNjkgTCAyNTUuNzYgODkxLjg5IEwgMjU0LjY3IDg4Ni40MiBMIDI1My44OSA4ODAuNjIgTCAyNTMuMjAgODc0LjgzIEwgMjUyLjMzIDg2OS40MCBMIDI1MS4wNyA4NjQuNjMgTCAyNDkuMjAgODYwLjc1IEwgMjQ2LjU4IDg1Ny45MCBMIDI0My4xNSA4NTYuMTEgTCAyMzguOTIgODU1LjMxIEwgMjMzLjk4IDg1NS4zMiBMIDIyOC41MiA4NTUuODkgTCAyMjIuNzUgODU2LjcyIEwgMjE2Ljk0IDg1Ny40NyBMIDIxMS4zNyA4NTcuODMgTCAyMDYuMzIgODU3LjUxIEwgMjAxLjk4IDg1Ni4zMSBMIDE5OC41MyA4NTQuMTAgTCAxOTYuMDIgODUwLjg1IEwgMTk0LjQ0IDg0Ni42MyBMIDE5My42OSA4NDEuNjIgTCAxOTMuNTYgODM2LjA1IEwgMTkzLjgwIDgzMC4yMCBMIDE5NC4xMiA4MjQuMzggTCAxOTQuMjIgODE4Ljg4IEwgMTkzLjgwIDgxMy45NiBMIDE5Mi42MyA4MDkuODIgTCAxOTAuNTUgODA2LjU2IEwgMTg3LjQ4IDgwNC4yMCBMIDE4My40NSA4MDIuNjcgTCAxNzguNTkgODAxLjgzIEwgMTczLjExIDgwMS40NCBMIDE2Ny4yOCA4MDEuMjUgTCAxNjEuNDMgODAwLjk5IEwgMTU1Ljg5IDgwMC4zNyBMIDE1MC45NiA3OTkuMTggTCAxNDYuOTAgNzk3LjI1IEwgMTQzLjg4IDc5NC40NyBMIDE0MS45OCA3OTAuODMgTCAxNDEuMTYgNzg2LjQxIEwgMTQxLjI4IDc4MS4zNCBMIDE0Mi4xMyA3NzUuODMgTCAxNDMuMzggNzcwLjExIEwgMTQ0LjcxIDc2NC40MyBMIDE0NS43NiA3NTkuMDQgTCAxNDYuMjAgNzU0LjEyIEwgMTQ1Ljc2IDc0OS44NCBMIDE0NC4yOCA3NDYuMjYgTCAxNDEuNjcgNzQzLjQxIEwgMTM3Ljk3IDc0MS4yMSBMIDEzMy4zMyA3MzkuNTMgTCAxMjcuOTkgNzM4LjIwIEwgMTIyLjI5IDczNy4wMCBMIDExNi41NyA3MzUuNzIgTCAxMTEuMjIgNzM0LjE1IEwgMTA2LjU4IDczMi4xMyBMIDEwMi45MiA3MjkuNTEgTCAxMDAuNDMgNzI2LjI1IEwgOTkuMTggNzIyLjM0IEwgOTkuMTQgNzE3Ljg0IEwgMTAwLjE1IDcxMi44NyBMIDEwMS45MyA3MDcuNTkgTCAxMDQuMTYgNzAyLjE4IEwgMTA2LjQ1IDY5Ni44MiBMIDEwOC40MiA2OTEuNjggTCAxMDkuNzEgNjg2LjkyIEwgMTEwLjAzIDY4Mi42MyBMIDEwOS4xOSA2NzguODUgTCAxMDcuMTEgNjc1LjU5IEwgMTAzLjg1IDY3Mi43NyBMIDk5LjU3IDY3MC4zMiBMIDk0LjU1IDY2OC4wOCBMIDg5LjE0IDY2NS45MSBMIDgzLjczIDY2My42NiBMIDc4Ljc0IDY2MS4xOCBMIDc0LjUxIDY1OC4zOCBMIDcxLjM2IDY1NS4xNyBMIDY5LjQ4IDY1MS41MyBMIDY4LjkzIDY0Ny40NiBMIDY5LjY3IDY0My4wMiBMIDcxLjUyIDYzOC4zMSBMIDc0LjIwIDYzMy40MSBMIDc3LjMzIDYyOC40NyBMIDgwLjUyIDYyMy41OSBMIDgzLjM1IDYxOC44NyBMIDg1LjQ1IDYxNC40MSBMIDg2LjUxIDYxMC4yMyBMIDg2LjMzIDYwNi4zNyBMIDg0Ljg2IDYwMi43OSBMIDgyLjEzIDU5OS40NiBMIDc4LjM1IDU5Ni4yOSBMIDczLjc5IDU5My4yMiBMIDY4Ljg0IDU5MC4xNCBMIDYzLjkwIDU4Ni45OSBMIDU5LjQxIDU4My42OCBMIDU1Ljc0IDU4MC4xOSBMIDUzLjE5IDU3Ni40OCBMIDUxLjk3IDU3Mi41NiBMIDUyLjE0IDU2OC40NiBMIDUzLjY0IDU2NC4yMiBMIDU2LjI4IDU1OS45MCBMIDU5Ljc3IDU1NS41NSBMIDYzLjcxIDU1MS4yMiBMIDY3LjcwIDU0Ni45NyBMIDcxLjMxIDU0Mi44MiBMIDc0LjE0IDUzOC43OCBMIDc1LjkxIDUzNC44NSBMIDc2LjQxIDUzMS4wMiBMIDc1LjU4IDUyNy4yNCBMIDczLjQ4IDUyMy40OCBMIDcwLjMwIDUxOS43MSBMIDY2LjM0IDUxNS44OSBMIDYyLjAwIDUxMi4wMCBMIDU3LjY5IDUwOC4wNCBMIDUzLjg0IDUwNC4wMCBMIDUwLjgzIDQ5OS45MiBMIDQ4Ljk3IDQ5NS44MyBMIDQ4LjQ0IDQ5MS43NiBMIDQ5LjMyIDQ4Ny43NSBMIDUxLjUzIDQ4My44NCBMIDU0Ljg5IDQ4MC4wNCBMIDU5LjA3IDQ3Ni4zNSBMIDYzLjcxIDQ3Mi43OCBMIDY4LjM4IDQ2OS4yOCBMIDcyLjY1IDQ2NS44MiBMIDc2LjE1IDQ2Mi4zNCBMIDc4LjU3IDQ1OC43OCBMIDc5LjczIDQ1NS4wOSBMIDc5LjU2IDQ1MS4yMyBMIDc4LjE0IDQ0Ny4xNiBMIDc1LjY3IDQ0Mi44OSBMIDcyLjQ0IDQzOC40NCBMIDY4Ljg0IDQzMy44NiBMIDY1LjI4IDQyOS4yMSBMIDYyLjE5IDQyNC41NyBMIDU5Ljk0IDQyMC4wMyBMIDU4LjgxIDQxNS42NyBMIDU5LjAwIDQxMS41NyBMIDYwLjU2IDQwNy43OCBMIDYzLjQyIDQwNC4zMSBMIDY3LjM4IDQwMS4xNCBMIDcyLjE1IDM5OC4yNSBMIDc3LjMzIDM5NS41MyBMIDgyLjU0IDM5Mi45MCBMIDg3LjM0IDM5MC4yMyBMIDkxLjM5IDM4Ny40MSBMIDk0LjQwIDM4NC4zMyBMIDk2LjE4IDM4MC44OSBMIDk2LjY5IDM3Ny4wNiBMIDk2LjAwIDM3Mi44MSBMIDk0LjMwIDM2OC4xNyBMIDkxLjg5IDM2My4yMyBMIDg5LjE0IDM1OC4wOSBMIDg2LjQ1IDM1Mi44OSBMIDg0LjIxIDM0Ny43OSBMIDgyLjc3IDM0Mi45MiBMIDgyLjQyIDMzOC40NCBMIDgzLjMyIDMzNC40MyBMIDg1LjUyIDMzMC45NyBMIDg4Ljk0IDMyOC4wNSBMIDkzLjM5IDMyNS42MiBMIDk4LjU4IDMyMy41OSBMIDEwNC4xNiAzMjEuODIgTCAxMDkuNzQgMzIwLjEzIEwgMTE0Ljk0IDMxOC4zNCBMIDExOS40MiAzMTYuMjYgTCAxMjIuOTEgMzEzLjc1IEwgMTI1LjI2IDMxMC42OCBMIDEyNi40MyAzMDYuOTkgTCAxMjYuNDkgMzAyLjY4IEwgMTI1LjYyIDI5Ny44MyBMIDEyNC4xMSAyOTIuNTQgTCAxMjIuMjkgMjg3LjAwIEwgMTIwLjU0IDI4MS40MSBMIDExOS4yMiAyNzUuOTkgTCAxMTguNjUgMjcwLjk2IEwgMTE5LjA5IDI2Ni40OCBMIDEyMC42NyAyNjIuNjkgTCAxMjMuNDMgMjU5LjY2IEwgMTI3LjMxIDI1Ny4zOCBMIDEzMi4xMSAyNTUuNzYgTCAxMzcuNTggMjU0LjY3IEwgMTQzLjM4IDI1My44OSBMIDE0OS4xNyAyNTMuMjAgTCAxNTQuNjAgMjUyLjMzIEwgMTU5LjM3IDI1MS4wNyBMIDE2My4yNSAyNDkuMjAgTCAxNjYuMTAgMjQ2LjU4IEwgMTY3Ljg5IDI0My4xNSBMIDE2OC42OSAyMzguOTIgTCAxNjguNjggMjMzLjk4IEwgMTY4LjExIDIyOC41MiBMIDE2Ny4yOCAyMjIuNzUgTCAxNjYuNTMgMjE2Ljk0IEwgMTY2LjE3IDIxMS4zNyBMIDE2Ni40OSAyMDYuMzIgTCAxNjcuNjkgMjAxLjk4IEwgMTY5LjkwIDE5OC41MyBMIDE3My4xNSAxOTYuMDIgTCAxNzcuMzcgMTk0LjQ0IEwgMTgyLjM4IDE5My42OSBMIDE4Ny45NSAxOTMuNTYgTCAxOTMuODAgMTkzLjgwIEwgMTk5LjYyIDE5NC4xMiBMIDIwNS4xMiAxOTQuMjIgTCAyMTAuMDQgMTkzLjgwIEwgMjE0LjE4IDE5Mi42MyBMIDIxNy40NCAxOTAuNTUgTCAyMTkuODAgMTg3LjQ4IEwgMjIxLjMzIDE4My40NSBMIDIyMi4xNyAxNzguNTkgTCAyMjIuNTYgMTczLjExIEwgMjIyLjc1IDE2Ny4yOCBMIDIyMy4wMSAxNjEuNDMgTCAyMjMuNjMgMTU1Ljg5IEwgMjI0LjgyIDE1MC45NiBMIDIyNi43NSAxNDYuOTAgTCAyMjkuNTMgMTQzLjg4IEwgMjMzLjE3IDE0MS45OCBMIDIzNy41OSAxNDEuMTYgTCAyNDIuNjYgMTQxLjI4IEwgMjQ4LjE3IDE0Mi4xMyBMIDI1My44OSAxNDMuMzggTCAyNTkuNTcgMTQ0LjcxIEwgMjY0Ljk2IDE0NS43NiBMIDI2OS44OCAxNDYuMjAgTCAyNzQuMTYgMTQ1Ljc2IEwgMjc3Ljc0IDE0NC4yOCBMIDI4MC41OSAxNDEuNjcgTCAyODIuNzkgMTM3Ljk3IEwgMjg0LjQ3IDEzMy4zMyBMIDI4NS44MCAxMjcuOTkgTCAyODcuMDAgMTIyLjI5IEwgMjg4LjI4IDExNi41NyBMIDI4OS44NSAxMTEuMjIgTCAyOTEuODcgMTA2LjU4IEwgMjk0LjQ5IDEwMi45MiBMIDI5Ny43NSAxMDAuNDMgTCAzMDEuNjYgOTkuMTggTCAzMDYuMTYgOTkuMTQgTCAzMTEuMTMgMTAwLjE1IEwgMzE2LjQxIDEwMS45MyBMIDMyMS44MiAxMDQuMTYgTCAzMjcuMTggMTA2LjQ1IEwgMzMyLjMyIDEwOC40MiBMIDMzNy4wOCAxMDkuNzEgTCAzNDEuMzcgMTEwLjAzIEwgMzQ1LjE1IDEwOS4xOSBMIDM0OC40MSAxMDcuMTEgTCAzNTEuMjMgMTAzLjg1IEwgMzUzLjY4IDk5LjU3IEwgMzU1LjkyIDk0LjU1IEwgMzU4LjA5IDg5LjE0IEwgMzYwLjM0IDgzLjczIEwgMzYyLjgyIDc4Ljc0IEwgMzY1LjYyIDc0LjUxIEwgMzY4LjgzIDcxLjM2IEwgMzcyLjQ3IDY5LjQ4IEwgMzc2LjU0IDY4LjkzIEwgMzgwLjk4IDY5LjY3IEwgMzg1LjY5IDcxLjUyIEwgMzkwLjU5IDc0LjIwIEwgMzk1LjUzIDc3LjMzIEwgNDAwLjQxIDgwLjUyIEwgNDA1LjEzIDgzLjM1IEwgNDA5LjU5IDg1LjQ1IEwgNDEzLjc3IDg2LjUxIEwgNDE3LjYzIDg2LjMzIEwgNDIxLjIxIDg0Ljg2IEwgNDI0LjU0IDgyLjEzIEwgNDI3LjcxIDc4LjM1IEwgNDMwLjc4IDczLjc5IEwgNDMzLjg2IDY4Ljg0IEwgNDM3LjAxIDYzLjkwIEwgNDQwLjMyIDU5LjQxIEwgNDQzLjgxIDU1Ljc0IEwgNDQ3LjUyIDUzLjE5IEwgNDUxLjQ0IDUxLjk3IEwgNDU1LjU0IDUyLjE0IEwgNDU5Ljc4IDUzLjY0IEwgNDY0LjEwIDU2LjI4IEwgNDY4LjQ1IDU5Ljc3IEwgNDcyLjc4IDYzLjcxIEwgNDc3LjAzIDY3LjcwIEwgNDgxLjE4IDcxLjMxIEwgNDg1LjIyIDc0LjE0IEwgNDg5LjE1IDc1LjkxIEwgNDkyLjk4IDc2LjQxIEwgNDk2Ljc2IDc1LjU4IEwgNTAwLjUyIDczLjQ4IEwgNTA0LjI5IDcwLjMwIEwgNTA4LjExIDY2LjM0IFoiIGZpbGw9IiMyRkFFNEYiLz4KICA8cGF0aCBkPSJNIDI2OSA1NTQgTCA0MjMgNzA4IEwgNzU1IDI5NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjExOCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPgo8L3N2Zz4K" class="pill-icon-elm rsvp-pill-icon-img" width="14" height="14" alt="" aria-hidden="true" decoding="async" /></span>
+                                <span>Hadir</span>
+                            </button>
+
+                            <button type="button"
+                                    class="rsvp-pill rsvp-pill--tidak"
+                                    data-rsvp-pill="tidak"
+                                    data-active="0">
+                                <span class="pill-icon"><img loading="lazy" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iVGlkYWsgSGFkaXIiPgogIDx0aXRsZT5UaWRhayBIYWRpcjwvdGl0bGU+CiAgPHBhdGggZD0iTSA1MTIuMDAgNjIuMDAgTCA1MTUuOTYgNTcuNjkgTCA1MjAuMDAgNTMuODQgTCA1MjQuMDggNTAuODMgTCA1MjguMTcgNDguOTcgTCA1MzIuMjQgNDguNDQgTCA1MzYuMjUgNDkuMzIgTCA1NDAuMTYgNTEuNTMgTCA1NDMuOTYgNTQuODkgTCA1NDcuNjUgNTkuMDcgTCA1NTEuMjIgNjMuNzEgTCA1NTQuNzIgNjguMzggTCA1NTguMTggNzIuNjUgTCA1NjEuNjYgNzYuMTUgTCA1NjUuMjIgNzguNTcgTCA1NjguOTEgNzkuNzMgTCA1NzIuNzcgNzkuNTYgTCA1NzYuODQgNzguMTQgTCA1ODEuMTEgNzUuNjcgTCA1ODUuNTYgNzIuNDQgTCA1OTAuMTQgNjguODQgTCA1OTQuNzkgNjUuMjggTCA1OTkuNDMgNjIuMTkgTCA2MDMuOTcgNTkuOTQgTCA2MDguMzMgNTguODEgTCA2MTIuNDMgNTkuMDAgTCA2MTYuMjIgNjAuNTYgTCA2MTkuNjkgNjMuNDIgTCA2MjIuODYgNjcuMzggTCA2MjUuNzUgNzIuMTUgTCA2MjguNDcgNzcuMzMgTCA2MzEuMTAgODIuNTQgTCA2MzMuNzcgODcuMzQgTCA2MzYuNTkgOTEuMzkgTCA2MzkuNjcgOTQuNDAgTCA2NDMuMTEgOTYuMTggTCA2NDYuOTQgOTYuNjkgTCA2NTEuMTkgOTYuMDAgTCA2NTUuODMgOTQuMzAgTCA2NjAuNzcgOTEuODkgTCA2NjUuOTEgODkuMTQgTCA2NzEuMTEgODYuNDUgTCA2NzYuMjEgODQuMjEgTCA2ODEuMDggODIuNzcgTCA2ODUuNTYgODIuNDIgTCA2ODkuNTcgODMuMzIgTCA2OTMuMDMgODUuNTIgTCA2OTUuOTUgODguOTQgTCA2OTguMzggOTMuMzkgTCA3MDAuNDEgOTguNTggTCA3MDIuMTggMTA0LjE2IEwgNzAzLjg3IDEwOS43NCBMIDcwNS42NiAxMTQuOTQgTCA3MDcuNzQgMTE5LjQyIEwgNzEwLjI1IDEyMi45MSBMIDcxMy4zMiAxMjUuMjYgTCA3MTcuMDEgMTI2LjQzIEwgNzIxLjMyIDEyNi40OSBMIDcyNi4xNyAxMjUuNjIgTCA3MzEuNDYgMTI0LjExIEwgNzM3LjAwIDEyMi4yOSBMIDc0Mi41OSAxMjAuNTQgTCA3NDguMDEgMTE5LjIyIEwgNzUzLjA0IDExOC42NSBMIDc1Ny41MiAxMTkuMDkgTCA3NjEuMzEgMTIwLjY3IEwgNzY0LjM0IDEyMy40MyBMIDc2Ni42MiAxMjcuMzEgTCA3NjguMjQgMTMyLjExIEwgNzY5LjMzIDEzNy41OCBMIDc3MC4xMSAxNDMuMzggTCA3NzAuODAgMTQ5LjE3IEwgNzcxLjY3IDE1NC42MCBMIDc3Mi45MyAxNTkuMzcgTCA3NzQuODAgMTYzLjI1IEwgNzc3LjQyIDE2Ni4xMCBMIDc4MC44NSAxNjcuODkgTCA3ODUuMDggMTY4LjY5IEwgNzkwLjAyIDE2OC42OCBMIDc5NS40OCAxNjguMTEgTCA4MDEuMjUgMTY3LjI4IEwgODA3LjA2IDE2Ni41MyBMIDgxMi42MyAxNjYuMTcgTCA4MTcuNjggMTY2LjQ5IEwgODIyLjAyIDE2Ny42OSBMIDgyNS40NyAxNjkuOTAgTCA4MjcuOTggMTczLjE1IEwgODI5LjU2IDE3Ny4zNyBMIDgzMC4zMSAxODIuMzggTCA4MzAuNDQgMTg3Ljk1IEwgODMwLjIwIDE5My44MCBMIDgyOS44OCAxOTkuNjIgTCA4MjkuNzggMjA1LjEyIEwgODMwLjIwIDIxMC4wNCBMIDgzMS4zNyAyMTQuMTggTCA4MzMuNDUgMjE3LjQ0IEwgODM2LjUyIDIxOS44MCBMIDg0MC41NSAyMjEuMzMgTCA4NDUuNDEgMjIyLjE3IEwgODUwLjg5IDIyMi41NiBMIDg1Ni43MiAyMjIuNzUgTCA4NjIuNTcgMjIzLjAxIEwgODY4LjExIDIyMy42MyBMIDg3My4wNCAyMjQuODIgTCA4NzcuMTAgMjI2Ljc1IEwgODgwLjEyIDIyOS41MyBMIDg4Mi4wMiAyMzMuMTcgTCA4ODIuODQgMjM3LjU5IEwgODgyLjcyIDI0Mi42NiBMIDg4MS44NyAyNDguMTcgTCA4ODAuNjIgMjUzLjg5IEwgODc5LjI5IDI1OS41NyBMIDg3OC4yNCAyNjQuOTYgTCA4NzcuODAgMjY5Ljg4IEwgODc4LjI0IDI3NC4xNiBMIDg3OS43MiAyNzcuNzQgTCA4ODIuMzMgMjgwLjU5IEwgODg2LjAzIDI4Mi43OSBMIDg5MC42NyAyODQuNDcgTCA4OTYuMDEgMjg1LjgwIEwgOTAxLjcxIDI4Ny4wMCBMIDkwNy40MyAyODguMjggTCA5MTIuNzggMjg5Ljg1IEwgOTE3LjQyIDI5MS44NyBMIDkyMS4wOCAyOTQuNDkgTCA5MjMuNTcgMjk3Ljc1IEwgOTI0LjgyIDMwMS42NiBMIDkyNC44NiAzMDYuMTYgTCA5MjMuODUgMzExLjEzIEwgOTIyLjA3IDMxNi40MSBMIDkxOS44NCAzMjEuODIgTCA5MTcuNTUgMzI3LjE4IEwgOTE1LjU4IDMzMi4zMiBMIDkxNC4yOSAzMzcuMDggTCA5MTMuOTcgMzQxLjM3IEwgOTE0LjgxIDM0NS4xNSBMIDkxNi44OSAzNDguNDEgTCA5MjAuMTUgMzUxLjIzIEwgOTI0LjQzIDM1My42OCBMIDkyOS40NSAzNTUuOTIgTCA5MzQuODYgMzU4LjA5IEwgOTQwLjI3IDM2MC4zNCBMIDk0NS4yNiAzNjIuODIgTCA5NDkuNDkgMzY1LjYyIEwgOTUyLjY0IDM2OC44MyBMIDk1NC41MiAzNzIuNDcgTCA5NTUuMDcgMzc2LjU0IEwgOTU0LjMzIDM4MC45OCBMIDk1Mi40OCAzODUuNjkgTCA5NDkuODAgMzkwLjU5IEwgOTQ2LjY3IDM5NS41MyBMIDk0My40OCA0MDAuNDEgTCA5NDAuNjUgNDA1LjEzIEwgOTM4LjU1IDQwOS41OSBMIDkzNy40OSA0MTMuNzcgTCA5MzcuNjcgNDE3LjYzIEwgOTM5LjE0IDQyMS4yMSBMIDk0MS44NyA0MjQuNTQgTCA5NDUuNjUgNDI3LjcxIEwgOTUwLjIxIDQzMC43OCBMIDk1NS4xNiA0MzMuODYgTCA5NjAuMTAgNDM3LjAxIEwgOTY0LjU5IDQ0MC4zMiBMIDk2OC4yNiA0NDMuODEgTCA5NzAuODEgNDQ3LjUyIEwgOTcyLjAzIDQ1MS40NCBMIDk3MS44NiA0NTUuNTQgTCA5NzAuMzYgNDU5Ljc4IEwgOTY3LjcyIDQ2NC4xMCBMIDk2NC4yMyA0NjguNDUgTCA5NjAuMjkgNDcyLjc4IEwgOTU2LjMwIDQ3Ny4wMyBMIDk1Mi42OSA0ODEuMTggTCA5NDkuODYgNDg1LjIyIEwgOTQ4LjA5IDQ4OS4xNSBMIDk0Ny41OSA0OTIuOTggTCA5NDguNDIgNDk2Ljc2IEwgOTUwLjUyIDUwMC41MiBMIDk1My43MCA1MDQuMjkgTCA5NTcuNjYgNTA4LjExIEwgOTYyLjAwIDUxMi4wMCBMIDk2Ni4zMSA1MTUuOTYgTCA5NzAuMTYgNTIwLjAwIEwgOTczLjE3IDUyNC4wOCBMIDk3NS4wMyA1MjguMTcgTCA5NzUuNTYgNTMyLjI0IEwgOTc0LjY4IDUzNi4yNSBMIDk3Mi40NyA1NDAuMTYgTCA5NjkuMTEgNTQzLjk2IEwgOTY0LjkzIDU0Ny42NSBMIDk2MC4yOSA1NTEuMjIgTCA5NTUuNjIgNTU0LjcyIEwgOTUxLjM1IDU1OC4xOCBMIDk0Ny44NSA1NjEuNjYgTCA5NDUuNDMgNTY1LjIyIEwgOTQ0LjI3IDU2OC45MSBMIDk0NC40NCA1NzIuNzcgTCA5NDUuODYgNTc2Ljg0IEwgOTQ4LjMzIDU4MS4xMSBMIDk1MS41NiA1ODUuNTYgTCA5NTUuMTYgNTkwLjE0IEwgOTU4LjcyIDU5NC43OSBMIDk2MS44MSA1OTkuNDMgTCA5NjQuMDYgNjAzLjk3IEwgOTY1LjE5IDYwOC4zMyBMIDk2NS4wMCA2MTIuNDMgTCA5NjMuNDQgNjE2LjIyIEwgOTYwLjU4IDYxOS42OSBMIDk1Ni42MiA2MjIuODYgTCA5NTEuODUgNjI1Ljc1IEwgOTQ2LjY3IDYyOC40NyBMIDk0MS40NiA2MzEuMTAgTCA5MzYuNjYgNjMzLjc3IEwgOTMyLjYxIDYzNi41OSBMIDkyOS42MCA2MzkuNjcgTCA5MjcuODIgNjQzLjExIEwgOTI3LjMxIDY0Ni45NCBMIDkyOC4wMCA2NTEuMTkgTCA5MjkuNzAgNjU1LjgzIEwgOTMyLjExIDY2MC43NyBMIDkzNC44NiA2NjUuOTEgTCA5MzcuNTUgNjcxLjExIEwgOTM5Ljc5IDY3Ni4yMSBMIDk0MS4yMyA2ODEuMDggTCA5NDEuNTggNjg1LjU2IEwgOTQwLjY4IDY4OS41NyBMIDkzOC40OCA2OTMuMDMgTCA5MzUuMDYgNjk1Ljk1IEwgOTMwLjYxIDY5OC4zOCBMIDkyNS40MiA3MDAuNDEgTCA5MTkuODQgNzAyLjE4IEwgOTE0LjI2IDcwMy44NyBMIDkwOS4wNiA3MDUuNjYgTCA5MDQuNTggNzA3Ljc0IEwgOTAxLjA5IDcxMC4yNSBMIDg5OC43NCA3MTMuMzIgTCA4OTcuNTcgNzE3LjAxIEwgODk3LjUxIDcyMS4zMiBMIDg5OC4zOCA3MjYuMTcgTCA4OTkuODkgNzMxLjQ2IEwgOTAxLjcxIDczNy4wMCBMIDkwMy40NiA3NDIuNTkgTCA5MDQuNzggNzQ4LjAxIEwgOTA1LjM1IDc1My4wNCBMIDkwNC45MSA3NTcuNTIgTCA5MDMuMzMgNzYxLjMxIEwgOTAwLjU3IDc2NC4zNCBMIDg5Ni42OSA3NjYuNjIgTCA4OTEuODkgNzY4LjI0IEwgODg2LjQyIDc2OS4zMyBMIDg4MC42MiA3NzAuMTEgTCA4NzQuODMgNzcwLjgwIEwgODY5LjQwIDc3MS42NyBMIDg2NC42MyA3NzIuOTMgTCA4NjAuNzUgNzc0LjgwIEwgODU3LjkwIDc3Ny40MiBMIDg1Ni4xMSA3ODAuODUgTCA4NTUuMzEgNzg1LjA4IEwgODU1LjMyIDc5MC4wMiBMIDg1NS44OSA3OTUuNDggTCA4NTYuNzIgODAxLjI1IEwgODU3LjQ3IDgwNy4wNiBMIDg1Ny44MyA4MTIuNjMgTCA4NTcuNTEgODE3LjY4IEwgODU2LjMxIDgyMi4wMiBMIDg1NC4xMCA4MjUuNDcgTCA4NTAuODUgODI3Ljk4IEwgODQ2LjYzIDgyOS41NiBMIDg0MS42MiA4MzAuMzEgTCA4MzYuMDUgODMwLjQ0IEwgODMwLjIwIDgzMC4yMCBMIDgyNC4zOCA4MjkuODggTCA4MTguODggODI5Ljc4IEwgODEzLjk2IDgzMC4yMCBMIDgwOS44MiA4MzEuMzcgTCA4MDYuNTYgODMzLjQ1IEwgODA0LjIwIDgzNi41MiBMIDgwMi42NyA4NDAuNTUgTCA4MDEuODMgODQ1LjQxIEwgODAxLjQ0IDg1MC44OSBMIDgwMS4yNSA4NTYuNzIgTCA4MDAuOTkgODYyLjU3IEwgODAwLjM3IDg2OC4xMSBMIDc5OS4xOCA4NzMuMDQgTCA3OTcuMjUgODc3LjEwIEwgNzk0LjQ3IDg4MC4xMiBMIDc5MC44MyA4ODIuMDIgTCA3ODYuNDEgODgyLjg0IEwgNzgxLjM0IDg4Mi43MiBMIDc3NS44MyA4ODEuODcgTCA3NzAuMTEgODgwLjYyIEwgNzY0LjQzIDg3OS4yOSBMIDc1OS4wNCA4NzguMjQgTCA3NTQuMTIgODc3LjgwIEwgNzQ5Ljg0IDg3OC4yNCBMIDc0Ni4yNiA4NzkuNzIgTCA3NDMuNDEgODgyLjMzIEwgNzQxLjIxIDg4Ni4wMyBMIDczOS41MyA4OTAuNjcgTCA3MzguMjAgODk2LjAxIEwgNzM3LjAwIDkwMS43MSBMIDczNS43MiA5MDcuNDMgTCA3MzQuMTUgOTEyLjc4IEwgNzMyLjEzIDkxNy40MiBMIDcyOS41MSA5MjEuMDggTCA3MjYuMjUgOTIzLjU3IEwgNzIyLjM0IDkyNC44MiBMIDcxNy44NCA5MjQuODYgTCA3MTIuODcgOTIzLjg1IEwgNzA3LjU5IDkyMi4wNyBMIDcwMi4xOCA5MTkuODQgTCA2OTYuODIgOTE3LjU1IEwgNjkxLjY4IDkxNS41OCBMIDY4Ni45MiA5MTQuMjkgTCA2ODIuNjMgOTEzLjk3IEwgNjc4Ljg1IDkxNC44MSBMIDY3NS41OSA5MTYuODkgTCA2NzIuNzcgOTIwLjE1IEwgNjcwLjMyIDkyNC40MyBMIDY2OC4wOCA5MjkuNDUgTCA2NjUuOTEgOTM0Ljg2IEwgNjYzLjY2IDk0MC4yNyBMIDY2MS4xOCA5NDUuMjYgTCA2NTguMzggOTQ5LjQ5IEwgNjU1LjE3IDk1Mi42NCBMIDY1MS41MyA5NTQuNTIgTCA2NDcuNDYgOTU1LjA3IEwgNjQzLjAyIDk1NC4zMyBMIDYzOC4zMSA5NTIuNDggTCA2MzMuNDEgOTQ5LjgwIEwgNjI4LjQ3IDk0Ni42NyBMIDYyMy41OSA5NDMuNDggTCA2MTguODcgOTQwLjY1IEwgNjE0LjQxIDkzOC41NSBMIDYxMC4yMyA5MzcuNDkgTCA2MDYuMzcgOTM3LjY3IEwgNjAyLjc5IDkzOS4xNCBMIDU5OS40NiA5NDEuODcgTCA1OTYuMjkgOTQ1LjY1IEwgNTkzLjIyIDk1MC4yMSBMIDU5MC4xNCA5NTUuMTYgTCA1ODYuOTkgOTYwLjEwIEwgNTgzLjY4IDk2NC41OSBMIDU4MC4xOSA5NjguMjYgTCA1NzYuNDggOTcwLjgxIEwgNTcyLjU2IDk3Mi4wMyBMIDU2OC40NiA5NzEuODYgTCA1NjQuMjIgOTcwLjM2IEwgNTU5LjkwIDk2Ny43MiBMIDU1NS41NSA5NjQuMjMgTCA1NTEuMjIgOTYwLjI5IEwgNTQ2Ljk3IDk1Ni4zMCBMIDU0Mi44MiA5NTIuNjkgTCA1MzguNzggOTQ5Ljg2IEwgNTM0Ljg1IDk0OC4wOSBMIDUzMS4wMiA5NDcuNTkgTCA1MjcuMjQgOTQ4LjQyIEwgNTIzLjQ4IDk1MC41MiBMIDUxOS43MSA5NTMuNzAgTCA1MTUuODkgOTU3LjY2IEwgNTEyLjAwIDk2Mi4wMCBMIDUwOC4wNCA5NjYuMzEgTCA1MDQuMDAgOTcwLjE2IEwgNDk5LjkyIDk3My4xNyBMIDQ5NS44MyA5NzUuMDMgTCA0OTEuNzYgOTc1LjU2IEwgNDg3Ljc1IDk3NC42OCBMIDQ4My44NCA5NzIuNDcgTCA0ODAuMDQgOTY5LjExIEwgNDc2LjM1IDk2NC45MyBMIDQ3Mi43OCA5NjAuMjkgTCA0NjkuMjggOTU1LjYyIEwgNDY1LjgyIDk1MS4zNSBMIDQ2Mi4zNCA5NDcuODUgTCA0NTguNzggOTQ1LjQzIEwgNDU1LjA5IDk0NC4yNyBMIDQ1MS4yMyA5NDQuNDQgTCA0NDcuMTYgOTQ1Ljg2IEwgNDQyLjg5IDk0OC4zMyBMIDQzOC40NCA5NTEuNTYgTCA0MzMuODYgOTU1LjE2IEwgNDI5LjIxIDk1OC43MiBMIDQyNC41NyA5NjEuODEgTCA0MjAuMDMgOTY0LjA2IEwgNDE1LjY3IDk2NS4xOSBMIDQxMS41NyA5NjUuMDAgTCA0MDcuNzggOTYzLjQ0IEwgNDA0LjMxIDk2MC41OCBMIDQwMS4xNCA5NTYuNjIgTCAzOTguMjUgOTUxLjg1IEwgMzk1LjUzIDk0Ni42NyBMIDM5Mi45MCA5NDEuNDYgTCAzOTAuMjMgOTM2LjY2IEwgMzg3LjQxIDkzMi42MSBMIDM4NC4zMyA5MjkuNjAgTCAzODAuODkgOTI3LjgyIEwgMzc3LjA2IDkyNy4zMSBMIDM3Mi44MSA5MjguMDAgTCAzNjguMTcgOTI5LjcwIEwgMzYzLjIzIDkzMi4xMSBMIDM1OC4wOSA5MzQuODYgTCAzNTIuODkgOTM3LjU1IEwgMzQ3Ljc5IDkzOS43OSBMIDM0Mi45MiA5NDEuMjMgTCAzMzguNDQgOTQxLjU4IEwgMzM0LjQzIDk0MC42OCBMIDMzMC45NyA5MzguNDggTCAzMjguMDUgOTM1LjA2IEwgMzI1LjYyIDkzMC42MSBMIDMyMy41OSA5MjUuNDIgTCAzMjEuODIgOTE5Ljg0IEwgMzIwLjEzIDkxNC4yNiBMIDMxOC4zNCA5MDkuMDYgTCAzMTYuMjYgOTA0LjU4IEwgMzEzLjc1IDkwMS4wOSBMIDMxMC42OCA4OTguNzQgTCAzMDYuOTkgODk3LjU3IEwgMzAyLjY4IDg5Ny41MSBMIDI5Ny44MyA4OTguMzggTCAyOTIuNTQgODk5Ljg5IEwgMjg3LjAwIDkwMS43MSBMIDI4MS40MSA5MDMuNDYgTCAyNzUuOTkgOTA0Ljc4IEwgMjcwLjk2IDkwNS4zNSBMIDI2Ni40OCA5MDQuOTEgTCAyNjIuNjkgOTAzLjMzIEwgMjU5LjY2IDkwMC41NyBMIDI1Ny4zOCA4OTYuNjkgTCAyNTUuNzYgODkxLjg5IEwgMjU0LjY3IDg4Ni40MiBMIDI1My44OSA4ODAuNjIgTCAyNTMuMjAgODc0LjgzIEwgMjUyLjMzIDg2OS40MCBMIDI1MS4wNyA4NjQuNjMgTCAyNDkuMjAgODYwLjc1IEwgMjQ2LjU4IDg1Ny45MCBMIDI0My4xNSA4NTYuMTEgTCAyMzguOTIgODU1LjMxIEwgMjMzLjk4IDg1NS4zMiBMIDIyOC41MiA4NTUuODkgTCAyMjIuNzUgODU2LjcyIEwgMjE2Ljk0IDg1Ny40NyBMIDIxMS4zNyA4NTcuODMgTCAyMDYuMzIgODU3LjUxIEwgMjAxLjk4IDg1Ni4zMSBMIDE5OC41MyA4NTQuMTAgTCAxOTYuMDIgODUwLjg1IEwgMTk0LjQ0IDg0Ni42MyBMIDE5My42OSA4NDEuNjIgTCAxOTMuNTYgODM2LjA1IEwgMTkzLjgwIDgzMC4yMCBMIDE5NC4xMiA4MjQuMzggTCAxOTQuMjIgODE4Ljg4IEwgMTkzLjgwIDgxMy45NiBMIDE5Mi42MyA4MDkuODIgTCAxOTAuNTUgODA2LjU2IEwgMTg3LjQ4IDgwNC4yMCBMIDE4My40NSA4MDIuNjcgTCAxNzguNTkgODAxLjgzIEwgMTczLjExIDgwMS40NCBMIDE2Ny4yOCA4MDEuMjUgTCAxNjEuNDMgODAwLjk5IEwgMTU1Ljg5IDgwMC4zNyBMIDE1MC45NiA3OTkuMTggTCAxNDYuOTAgNzk3LjI1IEwgMTQzLjg4IDc5NC40NyBMIDE0MS45OCA3OTAuODMgTCAxNDEuMTYgNzg2LjQxIEwgMTQxLjI4IDc4MS4zNCBMIDE0Mi4xMyA3NzUuODMgTCAxNDMuMzggNzcwLjExIEwgMTQ0LjcxIDc2NC40MyBMIDE0NS43NiA3NTkuMDQgTCAxNDYuMjAgNzU0LjEyIEwgMTQ1Ljc2IDc0OS44NCBMIDE0NC4yOCA3NDYuMjYgTCAxNDEuNjcgNzQzLjQxIEwgMTM3Ljk3IDc0MS4yMSBMIDEzMy4zMyA3MzkuNTMgTCAxMjcuOTkgNzM4LjIwIEwgMTIyLjI5IDczNy4wMCBMIDExNi41NyA3MzUuNzIgTCAxMTEuMjIgNzM0LjE1IEwgMTA2LjU4IDczMi4xMyBMIDEwMi45MiA3MjkuNTEgTCAxMDAuNDMgNzI2LjI1IEwgOTkuMTggNzIyLjM0IEwgOTkuMTQgNzE3Ljg0IEwgMTAwLjE1IDcxMi44NyBMIDEwMS45MyA3MDcuNTkgTCAxMDQuMTYgNzAyLjE4IEwgMTA2LjQ1IDY5Ni44MiBMIDEwOC40MiA2OTEuNjggTCAxMDkuNzEgNjg2LjkyIEwgMTEwLjAzIDY4Mi42MyBMIDEwOS4xOSA2NzguODUgTCAxMDcuMTEgNjc1LjU5IEwgMTAzLjg1IDY3Mi43NyBMIDk5LjU3IDY3MC4zMiBMIDk0LjU1IDY2OC4wOCBMIDg5LjE0IDY2NS45MSBMIDgzLjczIDY2My42NiBMIDc4Ljc0IDY2MS4xOCBMIDc0LjUxIDY1OC4zOCBMIDcxLjM2IDY1NS4xNyBMIDY5LjQ4IDY1MS41MyBMIDY4LjkzIDY0Ny40NiBMIDY5LjY3IDY0My4wMiBMIDcxLjUyIDYzOC4zMSBMIDc0LjIwIDYzMy40MSBMIDc3LjMzIDYyOC40NyBMIDgwLjUyIDYyMy41OSBMIDgzLjM1IDYxOC44NyBMIDg1LjQ1IDYxNC40MSBMIDg2LjUxIDYxMC4yMyBMIDg2LjMzIDYwNi4zNyBMIDg0Ljg2IDYwMi43OSBMIDgyLjEzIDU5OS40NiBMIDc4LjM1IDU5Ni4yOSBMIDczLjc5IDU5My4yMiBMIDY4Ljg0IDU5MC4xNCBMIDYzLjkwIDU4Ni45OSBMIDU5LjQxIDU4My42OCBMIDU1Ljc0IDU4MC4xOSBMIDUzLjE5IDU3Ni40OCBMIDUxLjk3IDU3Mi41NiBMIDUyLjE0IDU2OC40NiBMIDUzLjY0IDU2NC4yMiBMIDU2LjI4IDU1OS45MCBMIDU5Ljc3IDU1NS41NSBMIDYzLjcxIDU1MS4yMiBMIDY3LjcwIDU0Ni45NyBMIDcxLjMxIDU0Mi44MiBMIDc0LjE0IDUzOC43OCBMIDc1LjkxIDUzNC44NSBMIDc2LjQxIDUzMS4wMiBMIDc1LjU4IDUyNy4yNCBMIDczLjQ4IDUyMy40OCBMIDcwLjMwIDUxOS43MSBMIDY2LjM0IDUxNS44OSBMIDYyLjAwIDUxMi4wMCBMIDU3LjY5IDUwOC4wNCBMIDUzLjg0IDUwNC4wMCBMIDUwLjgzIDQ5OS45MiBMIDQ4Ljk3IDQ5NS44MyBMIDQ4LjQ0IDQ5MS43NiBMIDQ5LjMyIDQ4Ny43NSBMIDUxLjUzIDQ4My44NCBMIDU0Ljg5IDQ4MC4wNCBMIDU5LjA3IDQ3Ni4zNSBMIDYzLjcxIDQ3Mi43OCBMIDY4LjM4IDQ2OS4yOCBMIDcyLjY1IDQ2NS44MiBMIDc2LjE1IDQ2Mi4zNCBMIDc4LjU3IDQ1OC43OCBMIDc5LjczIDQ1NS4wOSBMIDc5LjU2IDQ1MS4yMyBMIDc4LjE0IDQ0Ny4xNiBMIDc1LjY3IDQ0Mi44OSBMIDcyLjQ0IDQzOC40NCBMIDY4Ljg0IDQzMy44NiBMIDY1LjI4IDQyOS4yMSBMIDYyLjE5IDQyNC41NyBMIDU5Ljk0IDQyMC4wMyBMIDU4LjgxIDQxNS42NyBMIDU5LjAwIDQxMS41NyBMIDYwLjU2IDQwNy43OCBMIDYzLjQyIDQwNC4zMSBMIDY3LjM4IDQwMS4xNCBMIDcyLjE1IDM5OC4yNSBMIDc3LjMzIDM5NS41MyBMIDgyLjU0IDM5Mi45MCBMIDg3LjM0IDM5MC4yMyBMIDkxLjM5IDM4Ny40MSBMIDk0LjQwIDM4NC4zMyBMIDk2LjE4IDM4MC44OSBMIDk2LjY5IDM3Ny4wNiBMIDk2LjAwIDM3Mi44MSBMIDk0LjMwIDM2OC4xNyBMIDkxLjg5IDM2My4yMyBMIDg5LjE0IDM1OC4wOSBMIDg2LjQ1IDM1Mi44OSBMIDg0LjIxIDM0Ny43OSBMIDgyLjc3IDM0Mi45MiBMIDgyLjQyIDMzOC40NCBMIDgzLjMyIDMzNC40MyBMIDg1LjUyIDMzMC45NyBMIDg4Ljk0IDMyOC4wNSBMIDkzLjM5IDMyNS42MiBMIDk4LjU4IDMyMy41OSBMIDEwNC4xNiAzMjEuODIgTCAxMDkuNzQgMzIwLjEzIEwgMTE0Ljk0IDMxOC4zNCBMIDExOS40MiAzMTYuMjYgTCAxMjIuOTEgMzEzLjc1IEwgMTI1LjI2IDMxMC42OCBMIDEyNi40MyAzMDYuOTkgTCAxMjYuNDkgMzAyLjY4IEwgMTI1LjYyIDI5Ny44MyBMIDEyNC4xMSAyOTIuNTQgTCAxMjIuMjkgMjg3LjAwIEwgMTIwLjU0IDI4MS40MSBMIDExOS4yMiAyNzUuOTkgTCAxMTguNjUgMjcwLjk2IEwgMTE5LjA5IDI2Ni40OCBMIDEyMC42NyAyNjIuNjkgTCAxMjMuNDMgMjU5LjY2IEwgMTI3LjMxIDI1Ny4zOCBMIDEzMi4xMSAyNTUuNzYgTCAxMzcuNTggMjU0LjY3IEwgMTQzLjM4IDI1My44OSBMIDE0OS4xNyAyNTMuMjAgTCAxNTQuNjAgMjUyLjMzIEwgMTU5LjM3IDI1MS4wNyBMIDE2My4yNSAyNDkuMjAgTCAxNjYuMTAgMjQ2LjU4IEwgMTY3Ljg5IDI0My4xNSBMIDE2OC42OSAyMzguOTIgTCAxNjguNjggMjMzLjk4IEwgMTY4LjExIDIyOC41MiBMIDE2Ny4yOCAyMjIuNzUgTCAxNjYuNTMgMjE2Ljk0IEwgMTY2LjE3IDIxMS4zNyBMIDE2Ni40OSAyMDYuMzIgTCAxNjcuNjkgMjAxLjk4IEwgMTY5LjkwIDE5OC41MyBMIDE3My4xNSAxOTYuMDIgTCAxNzcuMzcgMTk0LjQ0IEwgMTgyLjM4IDE5My42OSBMIDE4Ny45NSAxOTMuNTYgTCAxOTMuODAgMTkzLjgwIEwgMTk5LjYyIDE5NC4xMiBMIDIwNS4xMiAxOTQuMjIgTCAyMTAuMDQgMTkzLjgwIEwgMjE0LjE4IDE5Mi42MyBMIDIxNy40NCAxOTAuNTUgTCAyMTkuODAgMTg3LjQ4IEwgMjIxLjMzIDE4My40NSBMIDIyMi4xNyAxNzguNTkgTCAyMjIuNTYgMTczLjExIEwgMjIyLjc1IDE2Ny4yOCBMIDIyMy4wMSAxNjEuNDMgTCAyMjMuNjMgMTU1Ljg5IEwgMjI0LjgyIDE1MC45NiBMIDIyNi43NSAxNDYuOTAgTCAyMjkuNTMgMTQzLjg4IEwgMjMzLjE3IDE0MS45OCBMIDIzNy41OSAxNDEuMTYgTCAyNDIuNjYgMTQxLjI4IEwgMjQ4LjE3IDE0Mi4xMyBMIDI1My44OSAxNDMuMzggTCAyNTkuNTcgMTQ0LjcxIEwgMjY0Ljk2IDE0NS43NiBMIDI2OS44OCAxNDYuMjAgTCAyNzQuMTYgMTQ1Ljc2IEwgMjc3Ljc0IDE0NC4yOCBMIDI4MC41OSAxNDEuNjcgTCAyODIuNzkgMTM3Ljk3IEwgMjg0LjQ3IDEzMy4zMyBMIDI4NS44MCAxMjcuOTkgTCAyODcuMDAgMTIyLjI5IEwgMjg4LjI4IDExNi41NyBMIDI4OS44NSAxMTEuMjIgTCAyOTEuODcgMTA2LjU4IEwgMjk0LjQ5IDEwMi45MiBMIDI5Ny43NSAxMDAuNDMgTCAzMDEuNjYgOTkuMTggTCAzMDYuMTYgOTkuMTQgTCAzMTEuMTMgMTAwLjE1IEwgMzE2LjQxIDEwMS45MyBMIDMyMS44MiAxMDQuMTYgTCAzMjcuMTggMTA2LjQ1IEwgMzMyLjMyIDEwOC40MiBMIDMzNy4wOCAxMDkuNzEgTCAzNDEuMzcgMTEwLjAzIEwgMzQ1LjE1IDEwOS4xOSBMIDM0OC40MSAxMDcuMTEgTCAzNTEuMjMgMTAzLjg1IEwgMzUzLjY4IDk5LjU3IEwgMzU1LjkyIDk0LjU1IEwgMzU4LjA5IDg5LjE0IEwgMzYwLjM0IDgzLjczIEwgMzYyLjgyIDc4Ljc0IEwgMzY1LjYyIDc0LjUxIEwgMzY4LjgzIDcxLjM2IEwgMzcyLjQ3IDY5LjQ4IEwgMzc2LjU0IDY4LjkzIEwgMzgwLjk4IDY5LjY3IEwgMzg1LjY5IDcxLjUyIEwgMzkwLjU5IDc0LjIwIEwgMzk1LjUzIDc3LjMzIEwgNDAwLjQxIDgwLjUyIEwgNDA1LjEzIDgzLjM1IEwgNDA5LjU5IDg1LjQ1IEwgNDEzLjc3IDg2LjUxIEwgNDE3LjYzIDg2LjMzIEwgNDIxLjIxIDg0Ljg2IEwgNDI0LjU0IDgyLjEzIEwgNDI3LjcxIDc4LjM1IEwgNDMwLjc4IDczLjc5IEwgNDMzLjg2IDY4Ljg0IEwgNDM3LjAxIDYzLjkwIEwgNDQwLjMyIDU5LjQxIEwgNDQzLjgxIDU1Ljc0IEwgNDQ3LjUyIDUzLjE5IEwgNDUxLjQ0IDUxLjk3IEwgNDU1LjU0IDUyLjE0IEwgNDU5Ljc4IDUzLjY0IEwgNDY0LjEwIDU2LjI4IEwgNDY4LjQ1IDU5Ljc3IEwgNDcyLjc4IDYzLjcxIEwgNDc3LjAzIDY3LjcwIEwgNDgxLjE4IDcxLjMxIEwgNDg1LjIyIDc0LjE0IEwgNDg5LjE1IDc1LjkxIEwgNDkyLjk4IDc2LjQxIEwgNDk2Ljc2IDc1LjU4IEwgNTAwLjUyIDczLjQ4IEwgNTA0LjI5IDcwLjMwIEwgNTA4LjExIDY2LjM0IFoiIGZpbGw9IiNGMjBEMTYiLz4KICA8ZyBmaWxsPSJub25lIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMTI0IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbGluZWpvaW49Im1pdGVyIj4KICAgIDxwYXRoIGQ9Ik0gMzE1IDMxNSBMIDcwOSA3MDkiLz4KICAgIDxwYXRoIGQ9Ik0gNzA5IDMxNSBMIDMxNSA3MDkiLz4KICA8L2c+Cjwvc3ZnPgo=" class="pill-icon-elm rsvp-pill-icon-img" width="14" height="14" alt="" aria-hidden="true" decoding="async" /></span>
+                                <span>Tidak Hadir</span>
+                            </button>
+                        </div>
+                                            </div>
+
+                <div class="rsvp-field rsvp-jumlah-tamu-wrap" style="display:none;">
+                    <label class="rsvp-jumlah-tamu">
+                        <span class="rsvp-jumlah-tamu-label">Jumlah Tamu</span>
+                        <select class="rsvp-jumlah-tamu-select" data-rsvp="guest-count" aria-label="Jumlah tamu">
+                            <option value="1">1</option>
+                        </select>
+                    </label>
+                </div>
+                
+                <!-- Error + Tombol -->
+                <div class="rsvp-field rsvp-field--btn rsvp-btn-align-stretch">
+                    <button class="rsvp-send" data-rsvp="send" type="button">
+                        Kirim                    </button>
+                </div>
+
+
+            </div>
+
+            <!-- live feedback -->
+            <div class="rsvp-live" aria-live="polite"></div>
+
+            <!-- Ucapan yang telah dikirim -->
+            <div class="rsvp-comments-wrap"
+                 data-post="32120"
+                 data-per-page="10"
+                 data-has-pager="1">
+                <div class="rsvp-list-wrap"><ul class="rsvp-list"></ul></div>
+            </div>
+
+            <noscript>
+              <div class="rsvp-error" role="alert">
+                JavaScript dibutuhkan untuk mengirim RSVP. Silakan aktifkan JavaScript di browser Anda.
+              </div>
+            </noscript>
+
+            
+
+        </div>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-4e784b50 elementor-widget elementor-widget-spacer" data-id="4e784b50" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-2c67d4d7 e-con-full e-flex e-con e-child" data-id="2c67d4d7" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+		<div class="elementor-element elementor-element-1283a7a e-con-full e-flex e-con e-child" data-id="1283a7a" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-6c183bdb acara1 elementor-widget elementor-widget-image" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="6c183bdb" data-element_type="widget" data-e-type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+															<img fetchpriority="high" decoding="async" width="875" height="1130" src="assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903.jpg" class="attachment-full size-full wp-image-34076" alt="" srcset="assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903.jpg 875w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903-232x300.jpg 232w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903-793x1024.jpg 793w, assets/vendor/site/wp-content/uploads/2026/06/25KN154_AKHIR-e1761191657903-768x992.jpg 768w" sizes="(max-width: 875px) 100vw, 875px" />															</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-43bb9c9d elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="43bb9c9d" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Merupakan suatu kehormatan dan kebahagiaan bagi kami, apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu. Atas kehadiran dan doa restunya, kami mengucapkan terima kasih.								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-7ad03826 elementor-widget elementor-widget-text-editor" data-reveal-offset="100" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="7ad03826" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									Kami yang berbahagia,								</div>
+				</div>
+				<div class="idb-reveal idb-ef zoom-down elementor-element elementor-element-76fc870b elementor-widget elementor-widget-heading" data-reveal-offset="0" data-reveal-duration="2000" data-reveal-delay="0" style="transition-duration: 2000ms;" data-id="76fc870b" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default">
+				<div class="elementor-widget-container">
+					<h2 class="elementor-heading-title elementor-size-default">Habib &amp; Adiba</h2>				</div>
+				</div>
+				<div class="elementor-element elementor-element-5c41c5b3 elementor-widget elementor-widget-spacer" data-id="5c41c5b3" data-element_type="widget" data-e-type="widget" data-widget_type="spacer.default">
+				<div class="elementor-widget-container">
+							<div class="elementor-spacer">
+			<div class="elementor-spacer-inner"></div>
+		</div>
+						</div>
+				</div>
+				</div>
+				</div>
+		<div class="elementor-element elementor-element-6872e9d4 e-con-full e-flex e-con e-child" data-id="6872e9d4" data-element_type="container" data-e-type="container" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+				<div class="elementor-element elementor-element-452a2fc6 elementor-widget elementor-widget-text-editor" data-id="452a2fc6" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<div class="idb-watermark-block is-wm-order-logo_first" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;text-align:center;width:100%;max-width:100%"><span class="idb-watermark-text">Made with ❤ by Punakawan Digital</span></div>								</div>
+				</div>
+				<div class="elementor-element elementor-element-7d4c8c50 elementor-widget elementor-widget-bisdev_social_icons" data-id="7d4c8c50" data-element_type="widget" data-e-type="widget" data-widget_type="bisdev_social_icons.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-social-icons is-auto-columns  is-shape-circle" style="">
+                                            <a
+                    class="idb-social-icons__item elementor-animation-grow"
+                    href="https://www.tiktok.com/@punakawandigital?is_from_webapp=1&amp;sender_device=pc"
+                    aria-label="TikTok"
+                    title="TikTok"
+                    style=""
+                                        target="_blank"                    rel="nofollow noopener noreferrer"                >
+                    <i class="fab fa-tiktok" aria-hidden="true"></i>                                    </a>
+                                            <a
+                    class="idb-social-icons__item elementor-animation-grow"
+                    href="https://wa.me/6285727915000"
+                    aria-label="WhatsApp"
+                    title="WhatsApp"
+                    style=""
+                                        target="_blank"                    rel="nofollow noopener noreferrer"                >
+                    <i class="fab fa-whatsapp" aria-hidden="true"></i>                                    </a>
+                    </div>
+        				</div>
+				</div>
+				<div class="elementor-element elementor-element-208f1d2 elementor-widget elementor-widget-bisdev_musik" data-id="208f1d2" data-element_type="widget" data-e-type="widget" data-settings="{&quot;sticky&quot;:&quot;bottom&quot;,&quot;sticky_offset&quot;:50,&quot;sticky_on&quot;:[&quot;desktop&quot;,&quot;tablet&quot;,&quot;mobile&quot;],&quot;sticky_effects_offset&quot;:0,&quot;sticky_anchor_link_offset&quot;:0}" data-widget_type="bisdev_musik.default">
+				<div class="elementor-widget-container">
+					        <div class="idb-audio-box idb-align-right"
+         data-inited="0"
+         data-start="15"
+         data-end="0"
+         data-autoplay="0"
+         data-loop="1"
+         data-volume="0.8"
+         data-fadein="600"
+         data-fadeout="600"
+         data-rotate="1"
+         data-rotatespeed="12"
+         style="display:flex; align-items:center; gap:10px;"
+    >
+      <audio id="idb-audio-208f1d2" class="idb-audio-el" preload="metadata" playsinline>
+        <source src="assets/vendor/site/wp-content/uploads/2026/06/in-my-imagination-mp3cut.net_.mp3" type="audio/mpeg">
+      </audio>
+
+      <!-- OFF (PAUSE) -->
+    <div class="elementor-icon-wrapper idb-mute-sound">
+      <div class="elementor-icon elementor-animation-shrink" role="button" tabindex="0" aria-label="Play musik">
+        <i aria-hidden="true" class="far fa-pause-circle"></i>      </div>
+    </div>
+    
+    <div class="elementor-icon-wrapper idb-unmute-sound" style="display:none;">
+      <div class="elementor-icon elementor-animation-shrink" role="button" tabindex="0" aria-label="Pause musik">
+        <i aria-hidden="true" class="fas fa-compact-disc"></i>      </div>
     </div>
 
-    <main>
-        <div class="main">
-            <section class="hero" aria-labelledby="hero-title">
-                <div class="hero-copy">
-                    <p class="eyebrow">The Wedding of</p>
-                    <h2 id="hero-title">{{ $invitation['groom'] }} <span>&amp; {{ $invitation['bride'] }}</span></h2>
-                    <div class="ornament" style="margin-left:0" aria-hidden="true">
-                        <svg viewBox="0 0 20 20"><path d="M10 1.5c1.8 3.3 5.2 6.7 8.5 8.5-3.3 1.8-6.7 5.2-8.5 8.5C8.2 15.2 4.8 11.8 1.5 10 4.8 8.2 8.2 4.8 10 1.5Z"/><circle cx="10" cy="10" r="2.3"/></svg>
-                    </div>
-                    <p class="hero-quote">“Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu agar kamu merasa tenteram dan dijadikan-Nya di antaramu rasa kasih dan sayang.” <span class="small-label">(QS. Ar-Rum: 21)</span></p>
-                    <a class="button button-solid" href="#acara">Lihat Detail Acara <span aria-hidden="true">↓</span></a>
-                </div>
-                <div class="hero-art" role="img" aria-label="Ilustrasi abstrak bernuansa alam untuk pernikahan">
-                    <svg class="hero-botanical" viewBox="0 0 500 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                        <defs>
-                            <linearGradient id="arch-fill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d9dfc3" stop-opacity=".26"/><stop offset="1" stop-color="#24392e" stop-opacity=".06"/></linearGradient>
-                            <linearGradient id="hill-fill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#445e49"/><stop offset="1" stop-color="#1d342b"/></linearGradient>
-                        </defs>
-                        <circle cx="251" cy="177" r="100" fill="#ead6a0" opacity=".14"/>
-                        <path d="M96 366V205a154 154 0 0 1 308 0v161" fill="url(#arch-fill)" stroke="#efe4c2" stroke-opacity=".39" stroke-width="1.4"/>
-                        <path d="M125 366V210a125 125 0 0 1 250 0v156M145 366V215a105 105 0 0 1 210 0v151" fill="none" stroke="#efe4c2" stroke-opacity=".2"/>
-                        <path d="M126 368h248M143 383h214M160 397h180" fill="none" stroke="#ead9ad" stroke-opacity=".56" stroke-width="1.4"/>
-                        <path d="M0 473c63-46 112-38 174 1 69 44 124 28 185-1 53-26 92-25 141-1v148H0Z" fill="url(#hill-fill)" opacity=".8"/>
-                        <path d="M0 508c66-28 108-15 155 14 60 37 105 28 162 0 68-34 120-26 183 5" fill="none" stroke="#b9b48a" stroke-opacity=".37"/>
-                        <g fill="none" stroke="#dfd9b7" stroke-opacity=".78" stroke-width="1.6" stroke-linecap="round">
-                            <path d="M20 535C60 481 52 424 34 376m14 106c20-28 40-36 65-39m-53 6c-5-29-22-49-39-58m70 82c7-40 30-62 54-81"/>
-                            <path d="M478 549c-43-64-34-122-15-166m-12 109c-20-31-42-41-65-45m53 10c7-30 24-48 41-58m-72 84c-6-42-28-66-52-86"/>
-                            <path d="M28 445c-13-2-21-9-27-21 14 0 23 7 27 21Zm15 32c-14-1-23-7-31-18 14-2 24 4 31 18Zm19-36c-3-15 1-26 11-37 5 14 2 26-11 37Zm307 17c13-2 22-9 28-21-14 0-23 7-28 21Zm-16 32c14-1 23-7 31-18-14-2-24 4-31 18Zm-19-36c3-15-1-26-11-37-5 14-2 26 11 37Z"/>
-                        </g>
-                        <g fill="#e6cb96" fill-opacity=".88">
-                            <path d="M82 531c-15-8-19-18-13-31 13 5 19 15 13 31Zm-8-5c5-16 15-22 29-18-4 14-14 21-29 18Zm7-14c-3-17 3-26 17-30 3 15-3 25-17 30Zm-4 1c-15 6-27 2-33-11 13-8 25-4 33 11Z"/>
-                            <path d="M422 526c15-8 19-18 13-31-13 5-19 15-13 31Zm8-5c-5-16-15-22-29-18 4 14 14 21 29 18Zm-7-14c3-17-3-26-17-30-3 15 3 25 17 30Zm4 1c15 6 27 2 33-11-13-8-25-4-33 11Z"/>
-                        </g>
-                        <g fill="#f2e6c7" opacity=".76">
-                            <circle cx="77" cy="512" r="3"/><circle cx="414" cy="507" r="3"/><circle cx="57" cy="550" r="2.2"/><circle cx="444" cy="548" r="2.2"/>
-                        </g>
-                    </svg>
-                    <div class="art-caption"><small>Save the date</small><strong>{{ $invitation['couple'] }}</strong></div>
-                </div>
-            </section>
+    </div>
 
-            <section class="section" id="mempelai">
-                <p class="eyebrow">Dengan memohon rahmat dan ridho Allah SWT</p>
-                <h2>Assalamu’alaikum Warahmatullahi Wabarakatuh</h2>
-                <svg class="floral-divider" viewBox="0 0 180 48" aria-hidden="true">
-                    <path d="M90 42V17m0 14c-11-1-19-7-22-17 11 1 19 7 22 17Zm0-6c11-1 19-7 22-17-11 1-19 7-22 17Zm0-5c-9-7-9-15 0-21 9 6 9 14 0 21ZM4 25h58m54 0h60m-150 0c8-12 17-12 25 0-8 12-17 12-25 0Zm130 0c-8-12-17-12-25 0 8 12 17 12 25 0Z" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <p class="section-intro">Dengan penuh kebahagiaan, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada pernikahan kami.</p>
-                <div class="couple-grid">
-                    <article class="person">
-                        <div class="person-monogram" aria-hidden="true">{{ mb_substr($invitation['groom'], 0, 1) }}</div>
-                        <h3>{{ $invitation['groom'] }}</h3>
-                        <p>{{ $invitation['groom_parents'] }}</p>
-                    </article>
-                    <span class="ampersand" aria-hidden="true">&amp;</span>
-                    <article class="person">
-                        <div class="person-monogram" aria-hidden="true">{{ mb_substr($invitation['bride'], 0, 1) }}</div>
-                        <h3>{{ $invitation['bride'] }}</h3>
-                        <p>{{ $invitation['bride_parents'] }}</p>
-                    </article>
-                </div>
-            </section>
-        </div>
+    				</div>
+				</div>
+				<div class="elementor-element elementor-element-7fa741c5 elementor-widget elementor-widget-html" data-id="7fa741c5" data-element_type="widget" data-e-type="widget" id="h" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<style>
+    
+.pluse3 img{ 
+     animation: pluse3 2s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left bottom
 
-        <section class="section section-dark" id="date">
-            <p class="eyebrow">Sebuah hari untuk dikenang</p>
-            <h2>Menuju Hari Bahagia</h2>
-            <svg class="floral-divider" viewBox="0 0 180 48" aria-hidden="true">
-                <path d="M90 42V17m0 14c-11-1-19-7-22-17 11 1 19 7 22 17Zm0-6c11-1 19-7 22-17-11 1-19 7-22 17Zm0-5c-9-7-9-15 0-21 9 6 9 14 0 21ZM4 25h58m54 0h60m-150 0c8-12 17-12 25 0-8 12-17 12-25 0Zm130 0c-8-12-17-12-25 0 8 12 17 12 25 0Z" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <p class="section-intro">{{ $invitation['date_label'] }}. Kehadiran dan doa Anda akan menjadi kebahagiaan bagi kami.</p>
-            <div class="countdown" id="countdown" data-date="{{ $invitation['date'] }}" aria-label="Hitung mundur hari pernikahan">
-                <div><strong data-unit="days">--</strong><span>Hari</span></div>
-                <div><strong data-unit="hours">--</strong><span>Jam</span></div>
-                <div><strong data-unit="minutes">--</strong><span>Menit</span></div>
-                <div><strong data-unit="seconds">--</strong><span>Detik</span></div>
-            </div>
-        </section>
+} 
 
-        <div class="main">
-            <section class="section" id="acara">
-                <p class="eyebrow">Dengan bahagia kami menanti kehadiran Anda</p>
-                <h2>Detail Acara</h2>
-                <svg class="floral-divider" viewBox="0 0 180 48" aria-hidden="true">
-                    <path d="M90 42V17m0 14c-11-1-19-7-22-17 11 1 19 7 22 17Zm0-6c11-1 19-7 22-17-11 1-19 7-22 17Zm0-5c-9-7-9-15 0-21 9 6 9 14 0 21ZM4 25h58m54 0h60m-150 0c8-12 17-12 25 0-8 12-17 12-25 0Zm130 0c-8-12-17-12-25 0 8 12 17 12 25 0Z" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <div class="event-grid">
-                    <article class="event-card">
-                        <p class="eyebrow">08.00 WIB</p>
-                        <h3>Akad Nikah</h3>
-                        <p class="event-date">{{ $invitation['date_label'] }}</p>
-                        <p>{{ $invitation['ceremony_time'] }}</p>
-                        <p><strong>{{ $invitation['venue'] }}</strong><br>{{ $invitation['address'] }}</p>
-                        <a class="map-link" href="{{ $invitation['map_url'] }}" target="_blank" rel="noopener noreferrer">Petunjuk lokasi ↗</a>
-                    </article>
-                    <article class="event-card">
-                        <p class="eyebrow">Merayakan bersama</p>
-                        <h3>Resepsi</h3>
-                        <p class="event-date">{{ $invitation['date_label'] }}</p>
-                        <p>{{ $invitation['reception_time'] }}</p>
-                        <p><strong>{{ $invitation['venue'] }}</strong><br>{{ $invitation['address'] }}</p>
-                        <a class="map-link" href="{{ $invitation['map_url'] }}" target="_blank" rel="noopener noreferrer">Petunjuk lokasi ↗</a>
-                    </article>
-                </div>
-            </section>
 
-            <section class="section" id="cerita">
-                <p class="eyebrow">Perjalanan kami</p>
-                <h2>Sepenggal Kisah</h2>
-                <svg class="floral-divider" viewBox="0 0 180 48" aria-hidden="true">
-                    <path d="M90 42V17m0 14c-11-1-19-7-22-17 11 1 19 7 22 17Zm0-6c11-1 19-7 22-17-11 1-19 7-22 17Zm0-5c-9-7-9-15 0-21 9 6 9 14 0 21ZM4 25h58m54 0h60m-150 0c8-12 17-12 25 0-8 12-17 12-25 0Zm130 0c-8-12-17-12-25 0 8 12 17 12 25 0Z" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <p class="section-intro">Setiap pertemuan menyimpan cerita. Inilah beberapa momen yang membawa kami menuju hari istimewa.</p>
-                <div class="story-list">
-                    @foreach ($invitation['story'] as $index => $story)
-                        <article class="story-item">
-                            <small>0{{ $index + 1 }}</small>
-                            <h3>{{ $story['title'] }}</h3>
-                            <p>{{ $story['body'] }}</p>
-                        </article>
-                    @endforeach
-                </div>
-            </section>
+.pluse1 img{ 
+     animation: pluse1 4s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: right bottom
 
-            <section class="section" id="galeri">
-                <p class="eyebrow">Momen penuh makna</p>
-                <h2>Galeri</h2>
-                <svg class="floral-divider" viewBox="0 0 180 48" aria-hidden="true">
-                    <path d="M90 42V17m0 14c-11-1-19-7-22-17 11 1 19 7 22 17Zm0-6c11-1 19-7 22-17-11 1-19 7-22 17Zm0-5c-9-7-9-15 0-21 9 6 9 14 0 21ZM4 25h58m54 0h60m-150 0c8-12 17-12 25 0-8 12-17 12-25 0Zm130 0c-8-12-17-12-25 0 8 12 17 12 25 0Z" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <p class="section-intro">Ruang galeri ini siap diisi foto pilihan Anda saat personalisasi undangan.</p>
-                <div class="gallery-grid" aria-label="Placeholder galeri foto">
-                    <div class="gallery-tile">Satu cerita</div><div class="gallery-tile">Dua hati</div><div class="gallery-tile">Satu tujuan</div>
-                    <div class="gallery-tile">Hari istimewa</div><div class="gallery-tile">Penuh syukur</div><div class="gallery-tile">Selamanya</div>
-                </div>
-            </section>
-        </div>
+} 
 
-        <section class="section section-dark" id="rsvp">
-            <p class="eyebrow">Kehadiran Anda berarti bagi kami</p>
-            <h2>Konfirmasi Kehadiran</h2>
-            <svg class="floral-divider" viewBox="0 0 180 48" aria-hidden="true">
-                <path d="M90 42V17m0 14c-11-1-19-7-22-17 11 1 19 7 22 17Zm0-6c11-1 19-7 22-17-11 1-19 7-22 17Zm0-5c-9-7-9-15 0-21 9 6 9 14 0 21ZM4 25h58m54 0h60m-150 0c8-12 17-12 25 0-8 12-17 12-25 0Zm130 0c-8-12-17-12-25 0 8 12 17 12 25 0Z" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <p class="section-intro">Mohon luangkan waktu untuk mengisi konfirmasi dan menyampaikan doa terbaik.</p>
-            @if (session('status'))
-                <p class="status-message" role="status">{{ session('status') }}</p>
-            @endif
-            @if ($errors->any())
-                <ul class="error-list" role="alert">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            @endif
-            <div class="rsvp-layout">
-                <aside class="rsvp-note">
-                    <p class="eyebrow">Terima kasih</p>
-                    <h3>Sampai jumpa di hari bahagia kami.</h3>
-                    <p>Konfirmasi kehadiran Anda membantu kami mempersiapkan hari istimewa dengan lebih baik. Setiap doa dan ucapan baik akan menjadi kenangan indah yang kami simpan.</p>
-                </aside>
-                <form action="{{ route('rsvps.store') }}" method="post">
-                    @csrf
-                    <div class="form-field">
-                        <label for="guest_name">Nama</label>
-                        <input id="guest_name" name="guest_name" type="text" value="{{ old('guest_name', $guestName === 'Tamu Undangan' ? '' : $guestName) }}" maxlength="120" autocomplete="name" required>
-                    </div>
-                    <fieldset class="form-field" style="border:0;padding:0">
-                        <legend class="form-label">Apakah Anda akan hadir?</legend>
-                        <div class="attendance-options">
-                            <label class="attendance-option"><input type="radio" name="attendance" value="attending" @checked(old('attendance') === 'attending') required><span>Insyaallah hadir</span></label>
-                            <label class="attendance-option"><input type="radio" name="attendance" value="not_attending" @checked(old('attendance') === 'not_attending')><span>Belum dapat hadir</span></label>
-                        </div>
-                    </fieldset>
-                    <div class="form-field" id="guestCountField" hidden>
-                        <label for="guest_count">Jumlah tamu (termasuk Anda)</label>
-                        <input id="guest_count" name="guest_count" type="number" min="1" max="10" value="{{ old('guest_count', 1) }}">
-                    </div>
-                    <div class="form-field">
-                        <label for="message">Ucapan dan doa <span class="small-label">(opsional)</span></label>
-                        <textarea id="message" name="message" maxlength="500" placeholder="Tuliskan doa terbaik Anda...">{{ old('message') }}</textarea>
-                    </div>
-                    <button class="button button-solid" type="submit">Kirim Konfirmasi <span aria-hidden="true">→</span></button>
-                </form>
-            </div>
-            <div class="wishes">
-                <h3>Doa dan Ucapan</h3>
-                @forelse ($wishes as $wish)
-                    <article class="wish">
-                        <strong>{{ $wish->guest_name }}</strong>
-                        <p>{{ $wish->message }}</p>
-                    </article>
-                @empty
-                    <p class="section-intro">Jadilah yang pertama menyampaikan ucapan dan doa.</p>
-                @endforelse
-            </div>
-        </section>
-    </main>
 
-    <footer class="footer">
-        <p>Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir.</p>
-        <p>Kami yang berbahagia,</p>
-        <strong>{{ $invitation['couple'] }}</strong>
-    </footer>
-    <script>
-        document.documentElement.classList.add('js-enabled');
+.wayanGR img {
+    animation: wayanGR 3s infinite linear;
+    animation-direction: alternate;
+    transform-origin: bottom
+}
 
-        const revealItems = document.querySelectorAll(
-            '.hero-copy, .hero-art, .section > .eyebrow, .section > h2, .section > .floral-divider, .section > .section-intro, .person, .countdown > div, .event-card, .story-item, .gallery-tile, .rsvp-note, .rsvp-layout form, .wishes, .footer p, .footer strong'
-        );
 
-        if ('IntersectionObserver' in window) {
-            const revealObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.12, rootMargin: '0px 0px -35px 0px' });
+.flowerLETL img{
+    left: -7%;
+    animation: flowerLETL 3s infinite linear;
+    animation-direction: alternate;
+    transform-origin: center;
+    width: 85%;
+}
 
-            revealItems.forEach((item, index) => {
-                item.classList.add('reveal', `reveal-delay-${index % 4}`);
-                if (!item.matches('.hero-copy, .hero-art')) {
-                    revealObserver.observe(item);
-                }
-            });
-        } else {
-            revealItems.forEach((item) => item.classList.add('is-visible'));
-        }
 
-        const opening = document.getElementById('opening');
-        document.getElementById('openInvitation').addEventListener('click', () => {
-            opening.classList.add('is-hidden');
-            document.body.style.overflow = '';
-            document.querySelectorAll('.hero-copy, .hero-art').forEach((item) => {
-                item.classList.add('is-visible');
-            });
-            document.getElementById('mempelai').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-        document.body.style.overflow = 'hidden';
+.fla1 img{
+    animation: fla1 1.8s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left 
+}
 
-        const countdown = document.getElementById('countdown');
-        const eventTime = new Date(countdown.dataset.date).getTime();
-        const updateCountdown = () => {
-            const remaining = Math.max(0, eventTime - Date.now());
-            const values = {
-                days: Math.floor(remaining / 86400000),
-                hours: Math.floor((remaining % 86400000) / 3600000),
-                minutes: Math.floor((remaining % 3600000) / 60000),
-                seconds: Math.floor((remaining % 60000) / 1000)
-            };
-            Object.entries(values).forEach(([unit, value]) => {
-                countdown.querySelector(`[data-unit="${unit}"]`).textContent = String(value).padStart(2, '0');
-            });
-        };
-        updateCountdown();
-        window.setInterval(updateCountdown, 1000);
 
-        const guestCountField = document.getElementById('guestCountField');
-        const guestCountInput = document.getElementById('guest_count');
-        const updateGuestCount = () => {
-            const attending = document.querySelector('input[name="attendance"]:checked')?.value === 'attending';
-            guestCountField.hidden = !attending;
-            guestCountInput.required = attending;
-        };
-        document.querySelectorAll('input[name="attendance"]').forEach((input) => {
-            input.addEventListener('change', updateGuestCount);
-        });
-        updateGuestCount();
-    </script>
+.fld1 img{
+    animation: fld1 2s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left bottom
+}
+
+.flc1 img{
+    animation: flc1 2.5s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: right bottom
+}
+
+.flb1 img{
+    animation: flb1 1.8s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left bottom  
+}
+
+
+
+@keyframes fla1 {
+    from {
+        transform: rotate(-3deg) scale(1)
+    }
+
+    to {
+        transform: rotate(0deg) scale(1.05)
+    }
+}
+
+
+@keyframes flb1 {
+    from {
+        transform: rotate(0deg) scale(1)
+    }
+
+    to {
+        transform: rotate(-3deg) scale(1.05)
+    }
+}
+
+@keyframes flc1 {
+    from {
+        transform: rotate(5deg) scale(1)
+    }
+
+    to {
+        transform: rotate(0deg) scale(1.05)
+    }
+}
+
+@keyframes fld1 {
+    from {
+        transform: rotate(2deg) scale(1)
+    }
+
+    to {
+        transform: rotate(-2deg) scale(1.1)
+    }
+}
+
+@keyframes wayanGL1 {
+    from {
+        transform: rotate(20deg)
+    }
+
+    to {
+        transform: rotate(40deg)
+    }
+}
+
+
+@keyframes flowerLETL { 
+0% {
+    transform: rotate(10deg) scale(1);
+}
+100% {
+    transform: rotate(-10deg) scale(1.1);
+}
+}
+
+
+@keyframes wayanGR1 { 
+0% {
+    transform: rotate(-20deg);
+}
+
+100% {
+    transform: rotate(-40deg);
+}
+}
+
+@keyframes pluse3 { 
+0%, 100% {
+    transform: scale3d(1,1,1);}
+50% {
+    transform: scale3d(1.05,1.05,1.05);}
+} 
+
+@keyframes pluse1 { 
+0%, 100% {
+    transform: scale3d(1,1,1);}
+50% {
+    transform: scale3d(1.05,1.05,1.05);}
+} 
+</style>				</div>
+				</div>
+				<div class="elementor-element elementor-element-3448600d elementor-widget elementor-widget-html" data-id="3448600d" data-element_type="widget" data-e-type="widget" id="h" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<style>
+    
+.pluse2 img{ 
+     animation: pluse2 2s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left top 
+
+} 
+
+
+.pluse img{ 
+     animation: pluse 4s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left top
+
+} 
+
+
+.wayanGR img{
+    animation: wayanGR 3s infinite linear;
+    animation-direction: alternate;
+    transform-origin: bottom;
+}
+
+.wayanGL img{
+    animation: wayanGL 3s infinite linear;
+    animation-direction: alternate;
+    transform-origin: bottom left;
+}
+
+
+.flowerLETL img {
+    left: -7%;
+    animation: flowerLETL 3s infinite linear;
+    animation-direction: alternate;
+    transform-origin: center;
+    width: 85%;
+}
+
+
+.fla img{
+    animation: fla 1.8s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left 
+}
+
+
+.fld img{
+    animation: fld 2s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left
+}
+
+.flc img{
+    animation: flc 2.5s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: left top
+}
+
+.flb img{
+    animation: flb 1.8s infinite linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: right top 
+}
+
+
+
+@keyframes fla {
+    from {
+        transform: rotate(-3deg) scale(1)
+    }
+
+    to {
+        transform: rotate(0deg) scale(1.05)
+    }
+}
+
+
+@keyframes flb {
+    from {
+        transform: rotate(0deg) scale(1)
+    }
+
+    to {
+        transform: rotate(-3deg) scale(1.05)
+    }
+}
+
+@keyframes flc {
+    from {
+        transform: rotate(5deg) scale(1)
+    }
+
+    to {
+        transform: rotate(0deg) scale(1.05)
+    }
+}
+
+@keyframes fld {
+    from {
+        transform: rotate(2deg) scale(1)
+    }
+
+    to {
+        transform: rotate(-2deg) scale(1.1)
+    }
+}
+
+@keyframes wayanGL {
+    from {
+        transform: rotate(0deg)
+    }
+
+    to {
+        transform: rotate(-5deg)
+    }
+}
+
+
+@keyframes flowerLETL { 
+0% {
+    transform: rotate(10deg) scale(1);
+}
+100% {
+    transform: rotate(-10deg) scale(1.1);
+}
+}
+
+
+@keyframes wayanGR { 
+0% {
+    transform: rotate(-5deg);
+}
+
+100% {
+    transform: rotate(0deg);
+}
+}
+
+@keyframes pluse2 { 
+0%, 100% {
+    transform: scale3d(1,1,1);}
+50% {
+    transform: scale3d(1.05,1.05,1.05);}
+} 
+
+@keyframes pluse { 
+0%, 100% {
+    transform: scale3d(1,1,1);}
+50% {
+    transform: scale3d(1.05,1.05,1.05);}
+} 
+</style>				</div>
+				</div>
+				<div class="elementor-element elementor-element-63320837 elementor-widget elementor-widget-html" data-id="63320837" data-element_type="widget" data-e-type="widget" id="h" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<script>
+jQuery(function () {
+  jQuery('#klik').on('click', function (e) {
+    e.preventDefault();
+
+    jQuery('#amplop').toggle(500);
+  });
+});
+</script>				</div>
+				</div>
+				<div class="elementor-element elementor-element-1dddfbe0 elementor-widget elementor-widget-html" data-id="1dddfbe0" data-element_type="widget" data-e-type="widget" id="h" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<link rel="stylesheet"
+  href="assets/vendor/cdn/gh/Bisdev-gift/bisdev-cover-reveal@main/css/bisdev-cover.min.css">
+
+<script>
+(function(){
+
+function setVh(){
+  document.documentElement.style.setProperty(
+    '--vh',
+    (window.innerHeight * 0.01) + 'px'
+  );
+}
+setVh();
+window.addEventListener('resize', setVh);
+
+let isLocked = true;
+let wasPlayingBeforeHide = false;
+
+document.addEventListener('DOMContentLoaded', function(){
+  lockSection();
+  initReveal();
+  bindOpenButton();
+});
+
+function lockSection(){
+  if(!isLocked) return;
+
+  const { scrollX, scrollY } = window;
+  window.onscroll = () => window.scrollTo(scrollX, scrollY);
+
+  document.body.style.cssText = `
+    position:fixed;
+    height:calc(var(--vh, 1vh) * 100);
+    left:0; right:0;
+    overflow-y:scroll;
+  `;
+}
+
+function unlockSection(){
+  window.onscroll = null;
+
+  const kolom = document.getElementById('kolom');
+  if(kolom){
+    kolom.style.cssText =
+      'transform:translateY(-100%);transition:1.5s ease-in-out;';
+  }
+
+  const sec = document.getElementById('sec');
+  if(sec){
+    sec.style.cssText =
+      'opacity:0;transition:1.5s ease-in-out;';
+    setTimeout(()=>{
+      sec.style.visibility='hidden';
+      document.body.classList.add('invitation-cover-opened');
+      setTimeout(()=>{
+        document.body.classList.add('invitation-content-ready');
+      },11000);
+    },1500);
+  }
+
+  document.body.style.cssText = '';
+  isLocked = false;
+}
+
+function showAw(){
+  const el = document.querySelector('.aw');
+  if(el) el.style.display='block';
+}
+
+function initReveal(){
+  if(document.body.classList.contains('elementor-editor-active')) return;
+  document.querySelectorAll('.af').forEach(el=>{
+    el.classList.add('active');
+  });
+}
+
+function getAudio(){
+  return document.querySelector('.idb-audio-box .idb-audio-el')
+      || document.getElementById('song');
+}
+
+function getPlayBtn(){
+  return document.querySelector('.idb-audio-box .idb-mute-sound');
+}
+
+function playMusic(){
+  window.__BISDEV_MUSIC_ALLOWED = true;
+
+  const btn = getPlayBtn();
+  if(btn){ btn.click(); return; }
+
+  const audio = getAudio();
+  if(audio) audio.play().catch(()=>{});
+}
+
+function pauseMusic(){
+  const a = getAudio();
+  if(!a) return;
+  wasPlayingBeforeHide = !a.paused;
+  a.pause();
+}
+
+function resumeMusic(){
+  if(!wasPlayingBeforeHide) return;
+
+  window.__BISDEV_MUSIC_ALLOWED = true;
+  const a = getAudio();
+  if(!a) return;
+
+  a.play().catch(()=>{
+    const btn = getPlayBtn();
+    if(btn){
+      btn.classList.add('idb-attention');
+      setTimeout(()=>btn.classList.remove('idb-attention'),2500);
+    }
+  });
+}
+
+function bindOpenButton(){
+  const btn = document.getElementById('open');
+  if(!btn) return;
+
+  btn.addEventListener('click',()=>{
+    unlockSection();
+    showAw();
+    playMusic();
+  },{ once:true });
+}
+
+document.addEventListener('visibilitychange',()=>{
+  document.hidden ? pauseMusic() : setTimeout(resumeMusic,200);
+});
+
+window.addEventListener('blur', pauseMusic);
+window.addEventListener('focus', ()=>setTimeout(resumeMusic,200));
+
+})();
+</script>
+				</div>
+				</div>
+				<div class="elementor-element elementor-element-659609f0 elementor-widget elementor-widget-html" data-id="659609f0" data-element_type="widget" data-e-type="widget" id="h" data-widget_type="html.default">
+				<div class="elementor-widget-container">
+					<!-- Untuk Chrome & Opera -->
+<meta name="theme-color" content="#275047"/>
+
+<!-- Untuk Safari iOS -->
+<meta name="apple-mobile-web-app-status-bar-style" content="#275047"/>
+
+<!-- Untuk Windows Phone --> <meta name="msapplication-navbutton-color" content="#275047"/>				</div>
+				</div>
+				</div>
+				</div>
+				</div>
+				</div>
+		<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/hello-elementor/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+			<script>
+				( () => {
+					const lazyloadRunObserver = () => {
+						const lazyloadBackgrounds = document.querySelectorAll( `.e-con.e-parent:not(.e-lazyloaded)` );
+						const lazyloadBackgroundObserver = new IntersectionObserver( ( entries ) => {
+							entries.forEach( ( entry ) => {
+								if ( entry.isIntersecting ) {
+									let lazyloadBackground = entry.target;
+									if( lazyloadBackground ) {
+										lazyloadBackground.classList.add( 'e-lazyloaded' );
+									}
+									lazyloadBackgroundObserver.unobserve( entry.target );
+								}
+							});
+						}, { rootMargin: '200px 0px 200px 0px' } );
+						lazyloadBackgrounds.forEach( ( lazyloadBackground ) => {
+							lazyloadBackgroundObserver.observe( lazyloadBackground );
+						} );
+					};
+					const events = [
+						'DOMContentLoaded',
+						'elementor/lazyload/observe',
+					];
+					events.forEach( ( event ) => {
+						document.addEventListener( event, lazyloadRunObserver );
+					} );
+				} )();
+			</script>
+			<link rel='stylesheet' id='font-awesome-5-all-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/font-awesome/css/all.min.css' media='all' />
+<link rel='stylesheet' id='font-awesome-4-shim-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/font-awesome/css/v4-shims.min.css' media='all' />
+<link rel='stylesheet' id='font-awesome-css' href='assets/vendor/site/wp-content/plugins/elementor/assets/lib/font-awesome/css/font-awesome.min.css' media='all' />
+<script id="hello-theme-frontend-js" src="assets/vendor/site/wp-content/themes/hello-elementor/assets/js/hello-frontend.js"></script>
+<script id="elementor-webpack-runtime-js" src="assets/vendor/site/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js"></script>
+<script id="elementor-frontend-modules-js" src="assets/vendor/site/wp-content/plugins/elementor/assets/js/frontend-modules.min.js"></script>
+<script id="jquery-ui-core-js-before">
+jQuery.uiBackCompat = true;
+//# sourceURL=jquery-ui-core-js-before
+</script>
+<script id="jquery-ui-core-js" src="assets/vendor/site/wp-includes/js/jquery/ui/core.min.js"></script>
+<script id="elementor-frontend-js-before">
+var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false,"isScriptDebug":false},"i18n":{"shareOnFacebook":"Bagikan di Facebook","shareOnX":"Share on X","pinIt":"Buat Pin","download":"Unduh","downloadImage":"Unduh gambar","fullscreen":"Layar Penuh","zoom":"Perbesar","share":"Bagikan","playVideo":"Putar Video","previous":"Sebelumnya","next":"Selanjutnya","close":"Tutup","a11yCarouselPrevSlideMessage":"Slide sebelumnya","a11yCarouselNextSlideMessage":"Slide selanjutnya","a11yCarouselFirstSlideMessage":"This is the first slide","a11yCarouselLastSlideMessage":"This is the last slide","a11yCarouselPaginationBulletMessage":"Go to slide"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Mobile Portrait","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Mobile Landscape","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet Portrait","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet Landscape","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Laptop","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Layar lebar","value":2400,"default_value":2400,"direction":"min","is_enabled":false}},"hasCustomBreakpoints":false},"version":"4.2.3","is_static":false,"experimentalFeatures":{"additional_custom_breakpoints":true,"container":true,"e_panel_promotions":true,"theme_builder_v2":true,"hello-theme-header-footer":true,"nested-elements":true,"global_classes_should_enforce_capabilities":true,"e_variables":true,"e_opt_in_v4_page":true,"e_components":true,"e_interactions":true,"e_widget_creation":true,"import-export-customization":true,"e_pro_atomic_form":true,"e_pro_collection_loop":true,"e_pro_variables":true,"e_pro_interactions":true},"urls":{"assets":"assets\/vendor\/site\/wp-content\/plugins\/elementor\/assets\/","ajaxurl":"https:\/\/inv.punakawandigital.id\/wp-admin\/admin-ajax.php","uploadUrl":"assets\/vendor\/site\/wp-content\/uploads"},"nonces":{"floatingButtonsClickTracking":"cc750399db","atomicFormsSendForm":"6a4928f18b"},"swiperClass":"swiper","settings":{"page":[],"editorPreferences":[]},"kit":{"active_breakpoints":["viewport_mobile","viewport_tablet"],"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description","hello_header_logo_type":"logo","hello_footer_logo_type":"logo"},"post":{"id":32120,"title":"Undangan%20Website%20Premium%2006","excerpt":"","featuredImage":"assets\/vendor\/site\/wp-content\/uploads\/2025\/11\/PREMIUM-VINTAGE-06-2-1020x1024.webp"}};
+//# sourceURL=elementor-frontend-js-before
+</script>
+<script id="elementor-frontend-js" src="assets/vendor/site/wp-content/plugins/elementor/assets/js/frontend.min.js"></script>
+<script id="bisdev-social-icons-widget-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/social-icons.a78283a8.js"></script>
+<script id="lottie-js" src="assets/vendor/site/wp-content/plugins/elementor-pro/assets/lib/lottie/lottie.min.js"></script>
+<script id="bisdev-countdown-widget-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/countdown.3204ad7d.js"></script>
+<script id="idb-reveal-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/reveal.0d3e995d.js"></script>
+<script id="bisdev-timeline-widget-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/timeline.df4c6578.js"></script>
+<script id="bisdev-musik-widget-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/musik.6b24e67c.js"></script>
+<script id="bisdev-invite-video-widget-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/invite-video.f301b30a.js"></script>
+<script id="swiper-js" src="assets/vendor/site/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js"></script>
+<script id="elementor-gallery-js" src="assets/vendor/site/wp-content/plugins/elementor/assets/lib/e-gallery/js/e-gallery.min.js"></script>
+<script id="bisdev-copy-rekening-widget-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/copy-rekening.bc3b177b.js"></script>
+<script id="bisdev-kirim-hadiah-widget-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/kirim-hadiah.a62d3579.js"></script>
+<script id="bisdev-konfirmasi-transfer-widget-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/konfirmasi-transfer.7a907b8e.js"></script>
+<script id="e-sticky-js" src="assets/vendor/site/wp-content/plugins/elementor-pro/assets/lib/sticky/jquery.sticky.min.js"></script>
+<script id="idb-footer-cleanup-js-before">
+document.body.dataset.idbHideParentMap={"wanita":0,"pria":0};
+//# sourceURL=idb-footer-cleanup-js-before
+</script>
+<script id="idb-footer-cleanup-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/footer-cleanup.a39553b2.js"></script>
+<script id="font-awesome-4-shim-js" src="assets/vendor/site/wp-content/plugins/elementor/assets/lib/font-awesome/js/v4-shims.min.js"></script>
+<script id="elementor-pro-webpack-runtime-js" src="assets/vendor/site/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js"></script>
+<script id="wp-hooks-js" src="assets/vendor/site/wp-includes/js/dist/hooks.min.js"></script>
+<script id="wp-i18n-js" src="assets/vendor/site/wp-includes/js/dist/i18n.min.js"></script>
+<script id="wp-i18n-js-after">
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+//# sourceURL=wp-i18n-js-after
+</script>
+<script id="elementor-pro-frontend-js-before">
+var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/inv.punakawandigital.id\/wp-admin\/admin-ajax.php","nonce":"a0c30a7cc2","urls":{"assets":"assets\/vendor\/site\/wp-content\/plugins\/elementor-pro\/assets\/","rest":"https:\/\/inv.punakawandigital.id\/wp-json\/"},"settings":{"lazy_load_background_images":true},"popup":{"hasPopUps":false},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"},"x-twitter":{"title":"X"},"threads":{"title":"Threads"}},"facebook_sdk":{"lang":"id_ID","app_id":""},"lottie":{"defaultAnimationUrl":"assets\/vendor\/site\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
+//# sourceURL=elementor-pro-frontend-js-before
+</script>
+<script id="elementor-pro-frontend-js" src="assets/vendor/site/wp-content/plugins/elementor-pro/assets/js/frontend.min.js"></script>
+<script id="pro-elements-handlers-js" src="assets/vendor/site/wp-content/plugins/elementor-pro/assets/js/elements-handlers.min.js"></script>
+<script id="idb-elementor-heading-amp-js" src="assets/vendor/site/wp-content/plugins/bisdev-pro/assets/dist/js/heading-amp.630569da.js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"assets/vendor/site/wp-includes/js/wp-emoji-release.min.js"}}
+</script>
+<script type="module">
+/*! This file is auto-generated */
+var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof HTMLScriptElement))throw new Error("Element missing: "+e);const r=JSON.parse(t.text),s=(window._wpemojiSettings=r,"wpEmojiSettingsSupports"),o=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(s,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const r=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===r[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,r){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!r(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,r){let a;const s=(a="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),o=(s.textBaseline="top",s.font="600 32px Arial",{});return e.forEach(e=>{o[e]=t(s,e,n,r)}),o}function a(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}r.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(s));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(o),u.toString(),c.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"});const a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=e=>{i(n=e.data),a.terminate(),t(n)})}catch(e){}i(n=f(o,u,c,p))}t(n)}).then(e=>{for(const n in e)r.supports[n]=e[n],r.supports.everything=r.supports.everything&&r.supports[n],"flag"!==n&&(r.supports.everythingExceptFlag=r.supports.everythingExceptFlag&&r.supports[n]);var t;r.supports.everythingExceptFlag=r.supports.everythingExceptFlag&&!r.supports.flag,r.supports.everything||((t=r.source||{}).concatemoji?a(t.concatemoji):t.wpemoji&&t.twemoji&&(a(t.twemoji),a(t.wpemoji)))});
+//# sourceURL=https://inv.punakawandigital.id/wp-includes/js/wp-emoji-loader.min.js
+</script>
+<script>
+const wdpAudio = document.querySelector('.idb-audio-box .idb-audio-el')
+  || document.getElementById('song')
+  || false;
+
+document.addEventListener('visibilitychange', event => {
+  if (document.visibilityState === 'visible') {
+    wdpAudio && wdpAudio.play();
+  } else {
+    wdpAudio && wdpAudio.pause();
+  }
+});
+</script>
+<style>/* =========================================
+   BISDEV COVER REVEAL – MINIFIED
+   Compatible: Elementor / Non-Elementor
+========================================= */
+.ytmFullscreenRelatedVideosEntryPointViewModelButton{
+	display:none!important;
+}
+	
+html,
+body{
+  height:100%;
+  min-height:100%;
+  margin:0;
+  padding:0;
+  -webkit-text-size-adjust:100%;
+}
+
+#sec{
+  position:fixed;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+  width:100vw;
+  height:calc(var(--vh, 1vh) * 100);
+  z-index:999;
+  opacity:1;
+  visibility:visible;
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+
+  /* penting: jangan blok sentuhan permanen */
+  pointer-events:none;
+}
+
+#kolom{
+  
+
+  /* isi cover tetap bisa diklik */
+  pointer-events:auto;
+}
+
+/* Kunci scroll HANYA saat body masih di-lock oleh script */
+body[style*="position:fixed"]{
+  overflow:hidden !important;
+  width:100% !important;
+  overscroll-behavior:none;
+  touch-action:none;
+  -webkit-overflow-scrolling:auto;
+}
+
+body[style*="position:fixed"] #kolom{
+  overscroll-behavior:none;
+  touch-action:none;
+}
+
+.aw{display:none}
+.elementor-editor-active .aw{display:block!important}
+
+.af{
+  opacity:0;
+  transform:translateY(6rem) scale(.93);
+  transition:all 3s ease;
+  -webkit-transform:translateY(6rem) scale(.93);
+  will-change:transform,opacity;
+}
+
+.af.active{
+  opacity:1;
+  transform:none;
+  -webkit-transform:none;
+}
+
+.af.zoom-in{
+  transform:scale(.8);
+  -webkit-transform:scale(.8);
+}
+.af.zoom-in.active{
+  transform:scale(1);
+  -webkit-transform:scale(1);
+}
+
+.af.zoom-out{
+  transform:scale(1.2);
+  -webkit-transform:scale(1.2);
+}
+.af.zoom-out.active{
+  transform:scale(1);
+  -webkit-transform:scale(1);
+}
+
+.af.slide-up{
+  transform:translateY(6rem);
+  -webkit-transform:translateY(6rem);
+}
+.af.slide-up.active{
+  transform:translateY(0);
+  -webkit-transform:translateY(0);
+}
+
+.af.slide-down{
+  transform:translateY(-6rem);
+  -webkit-transform:translateY(-6rem);
+}
+.af.slide-down.active{
+  transform:translateY(0);
+  -webkit-transform:translateY(0);
+}
+
+.af.slide-left{
+  transform:translateX(6rem);
+  -webkit-transform:translateX(6rem);
+}
+.af.slide-left.active{
+  transform:translateX(0);
+  -webkit-transform:translateX(0);
+}
+
+.af.slide-right{
+  transform:translateX(-6rem);
+  -webkit-transform:translateX(-6rem);
+}
+.af.slide-right.active{
+  transform:translateX(0);
+  -webkit-transform:translateX(0);
+}
+
+.elementor-editor-active .af{
+  opacity:1!important;
+  transform:none!important;
+  -webkit-transform:none!important;
+  transition:none!important
+}
+
+/* === Audio attention === */
+.idb-attention{
+  animation:idbPulse .8s ease-in-out 3
+}
+@keyframes idbPulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.08)}
+  100%{transform:scale(1)}
+}</style>
+<style>
+.rsvp-stats{
+	display : none!important;
+	}
+</style>
+<script id="invitation-personalization-js" src="assets/js/invitation.js" defer></script>
 </body>
+
 </html>

@@ -3,20 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Rsvp extends Model
 {
     protected $fillable = [
-        'guest_name',
-        'attendance',
+        'guest_id',
+        'presence',
         'guest_count',
         'message',
+        'owner_reply',
     ];
 
-    protected function casts(): array
+    public function guest(): BelongsTo
     {
-        return [
-            'guest_count' => 'integer',
-        ];
+        return $this->belongsTo(Guest::class);
     }
 }

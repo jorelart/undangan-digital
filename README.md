@@ -1,43 +1,123 @@
-# Undangan Digital
+# Undangan Pernikahan
 
-Starter undangan pernikahan berbasis Laravel dan MySQL. Tamu dapat membuka undangan personal, melihat detail acara, mengirim RSVP, dan meninggalkan ucapan. RSVP disimpan di MySQL; notifikasi ke WhatsApp owner dapat diaktifkan menggunakan WhatsApp Business Cloud API.
+Frontend undangan, Laravel 12, API webhook, dan database MySQL berada dalam
+satu project ini. Halaman utama dapat dibuka tanpa token. Tautan pribadi yang
+dihasilkan API memakai `#token=...`; nama penerima sampul mengikuti data tamu
+di database. Token di fragment tidak dikirim browser pada request halaman.
+Token hilang/tidak dikenal tetap menampilkan undangan umum.
 
-## Menjalankan di Laragon
+## Menjalankan secara lokal
 
-1. Jalankan layanan MySQL dari Laragon dan buat database `undangan_digital` (collation `utf8mb4_unicode_ci`).
-2. Periksa konfigurasi database pada `.env`. Nilai bawaan ditujukan untuk instalasi Laragon lokal (`root`, tanpa password); sesuaikan jika kredensial Anda berbeda.
-3. Jalankan `php artisan migrate`.
-4. Jalankan `php artisan serve`, lalu buka `http://localhost:8000`.
+1. Nyalakan MySQL Laragon.
+2. Pastikan database `invitation` sudah ada. Database ini sudah dibuat untuk
+   instalasi lokal ini.
+3. Dari folder project, jalankan:
 
-Data contoh pasangan dan acara dapat disesuaikan di `config/invitation.php`.
+   ```powershell
+   php artisan serve
+   ```
 
-## Tampilan dan personalisasi visual
+4. Buka `http://127.0.0.1:8000/`.
 
-Halaman undangan memakai font Cormorant Garamond, Great Vibes, dan DM Sans dari Google Fonts; koneksi internet diperlukan agar font tersebut dapat dimuat, dengan font sistem sebagai cadangan. Ornamen bunga dan ilustrasi sampul merupakan SVG orisinal. Galeri masih memakai placeholder dekoratif—ganti dengan foto milik sendiri atau foto yang Anda punya izin untuk gunakan saat mempersonalisasi halaman di `resources/views/invitation.blade.php`.
+Route utama dirender sebagai komponen halaman penuh Livewire 4 dari
+`resources/views/components/⚡home.blade.php` dengan layout utama
+`resources/views/layouts/app.blade.php`. Section undangan tetap tersusun dari
+partial di `resources/views/partials/invitation/`, sedangkan metadata, aset,
+dan scripts dimuat melalui layout tersebut. Personalisasi nama tamu membaca
+token undangan dari fragment URL melalui JavaScript; asset tetap dilayani
+dari `public/assets/`.
 
-## Notifikasi WhatsApp
+Jika URL berubah, sesuaikan `APP_URL` di `.env`. Untuk webhook WhatsApp yang
+berjalan di luar komputer ini, `APP_URL` harus memakai domain HTTPS publik.
 
-Integrasi ini mengirim **pesan template keluar** dari WhatsApp Business Cloud API ke nomor owner. Ini bukan webhook WhatsApp masuk. Buat dan ajukan persetujuan template berbahasa Indonesia bernama `rsvp_notification` dengan empat placeholder isi pesan, lalu isi variabel berikut di `.env`:
+## API webhook WhatsApp
 
-- `WHATSAPP_PHONE_NUMBER_ID`: ID nomor telepon dari Meta WhatsApp Cloud API.
-- `WHATSAPP_TOKEN`: access token API; jangan masukkan token ke source control.
-- `WHATSAPP_OWNER_PHONE`: nomor owner dalam format internasional tanpa tanda `+` (contoh: `6281234567890`).
-- `WHATSAPP_TEMPLATE_NAME` dan `WHATSAPP_TEMPLATE_LANGUAGE`: nama serta bahasa template yang disetujui.
+Semua endpoint API memerlukan header:
 
-Susunan placeholder template yang dikirim: nama tamu, status kehadiran, jumlah tamu, dan ucapan. Setelah konfigurasi lengkap, jalankan worker agar antrean notifikasi diproses:
-
-```sh
-php artisan queue:work --queue=whatsapp,default
+```http
+Authorization: Bearer <WHATSAPP_WEBHOOK_TOKEN>
+Accept: application/json
 ```
 
-Worker perlu tetap berjalan. Percobaan yang gagal akan dicoba ulang hingga tiga kali dan kegagalan permanen tercatat pada tabel `failed_jobs`.
+Atur `WHATSAPP_WEBHOOK_TOKEN` dengan nilai acak yang kuat di `.env`. Contoh
+menghasilkan nilai acak:
 
-## Personalisasi tautan undangan
-
-Nama tamu dapat ditampilkan pada sampul melalui query `to`, misalnya:
-
-```text
-http://localhost:8000/?to=Bapak%20Budi
+```powershell
+php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
 ```
 
-RSVP membatasi frekuensi pengiriman per IP dan memvalidasi nama, status kehadiran, jumlah tamu, serta panjang ucapan di server.
+Setelah mengubah `.env`, jalankan `php artisan config:clear`. Jangan masukkan
+secret ke source control. Endpoint:
+
+| Method | Endpoint | Fungsi |
+| --- | --- | --- |
+| `GET` | `/api/invitation` | Resolve token undangan dari header Bearer untuk menampilkan nama penerima. |
+| `POST` | `/api/v1/guests` | Membuat tamu dari nama, nomor WhatsApp, dan batas jumlah tamu; menghasilkan token serta tautan undangan. |
+| `GET` | `/api/v1/guests` | Daftar tamu berpaginasi (`per_page`, maksimal 100). |
+| `GET` | `/api/v1/guests?q=Ayu` | Cari nama atau nomor tamu. |
+| `GET` | `/api/v1/guests?phone=6281234567890` | Cari nomor WhatsApp yang dinormalisasi. |
+| `GET` | `/api/v1/guests/{id}` | Ambil detail tamu dan RSVP. |
+| `POST` | `/api/v1/guests/{id}/rsvp` | Simpan atau perbarui RSVP tamu. |
+| `POST` | `/api/v1/guests/{id}/rsvp/reply` | Simpan balasan pemilik (`owner_reply`) untuk RSVP tamu. |
+
+Gunakan URL dasar server yang sedang berjalan. Contoh untuk pengembangan lokal:
+
+```powershell
+$tokenLine = Get-Content .env | Where-Object { $_ -like 'WHATSAPP_WEBHOOK_TOKEN=*' }
+$token = $tokenLine -replace '^WHATSAPP_WEBHOOK_TOKEN=', ''
+$headers = @{
+    Authorization = "Bearer $token"
+    Accept = "application/json"
+}
+Invoke-RestMethod http://127.0.0.1:8000/api/v1/guests -Headers $headers
+Invoke-RestMethod "http://127.0.0.1:8000/api/v1/guests?q=Ayu" -Headers $headers
+```
+
+Contoh membuat tamu:
+
+```json
+{
+  "name": "Ayu Putri",
+  "phone": "+62 812-3456-7890",
+  "max_guests": 2
+}
+```
+
+Nomor telepon disimpan sebagai digit saja, misalnya `6281234567890`; nomor
+duplikat ditolak. `invitation_token` unik disimpan di database dan respons pembuatan tamu
+menyertakan token serta `invitation_url` untuk dikirim dari webhook WhatsApp.
+Endpoint daftar dan detail tidak membocorkan token.
+
+Contoh memperbarui RSVP:
+
+```json
+{
+  "presence": "hadir",
+  "guest_count": 2,
+  "message": "Insyaallah hadir."
+}
+```
+
+`presence` menerima `hadir` atau `tidak`. `guest_count` wajib diisi bila hadir
+dan tidak boleh melampaui batas pada undangan.
+
+Contoh membalas ucapan RSVP sebagai pemilik:
+
+```json
+{
+  "owner_reply": "Terima kasih atas doa dan ucapannya."
+}
+```
+
+Kirim objek tersebut ke `POST /api/v1/guests/{id}/rsvp/reply`. Halaman
+undangan menampilkan satu ucapan yang memiliki balasan dan satu ucapan tanpa
+balasan secara acak, jika masing-masing tersedia di database.
+
+Project ini belum mempunyai dashboard admin; daftar dan pengelolaan data
+dilakukan lewat API yang dilindungi secret webhook.
+
+## Tes
+
+```powershell
+php artisan test
+```
